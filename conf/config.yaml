@@ -1,0 +1,23 @@
+seed : 123
+batch_size : 40
+learning_rate: 0.01
+epochs: 400
+loss_function : 'CrossEntropy'
+num_qubits: 4
+feature_map_name : 'ZZ'
+feature_map_depth: 1
+feature_map_entanglement : 'full'
+ansatz_name : 'RA'
+ansatz_depth: 1
+ansatz_entanglement : 'linear'
+shots: Null
+quanvolution_name : 'quanvolution_sampler'
+quanvolution_out_channels: Null
+errors_names: ['depolarizing']
+errors_probabilities: [1]
+local: False
+dataset: 'Tetris'
+hydra:
+  sweep:
+    dir: multirun
+    subdir: ${hydra.job.override_dirname}
