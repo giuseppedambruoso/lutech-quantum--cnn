@@ -1,41 +1,46 @@
 # Import necessary libraries
-from quantorch.src.dataset import load_dataset, num_classes
-from quantorch.src.noise import NoiseCreator
-from quantorch.src.pre_main import ModelsCreator
-from quantorch.src.training import Trainer
 
-from torch import manual_seed
-from torch.nn import MSELoss, CrossEntropyLoss
+from quantorch.src2.qnn2 import QNN
+from quantorch.src2.dataset2 import load_dataset
+from quantorch.src2.noise2 import create_backend
+from quantorch.src2.net2 import create_cnn, ClassicNet, HybridNet
+from quantorch.src2.training2 import train_and_validate
+from quantorch.src2.plot2 import plot_results
+
+
+from torch import manual_seed, Tensor
+from torch.nn import MSELoss, CrossEntropyLoss, DataParallel
 
 import random
 import numpy as np
 import hydra
+from typing import List, Dict, Any
 from omegaconf import DictConfig
-from typing import Union
+from qiskit_aer import AerSimulator
 
 @hydra.main(version_base=None, config_path='conf', config_name='config')
 def main(config: DictConfig) -> None:
+
     # Define configuration
-    SEED = config['seed']
-    BATCH_SIZE = config['batch_size']
-    LEARNING_RATE = config['learning_rate']
-    EPOCHS = config['epochs']
-    loss_fn = MSELoss() if config['loss_function'] == 'MSE' else CrossEntropyLoss() if config['loss_function'] == 'CrossEntropy' else None
-    NUM_QUBITS = config['num_qubits']
-    SHOTS = config['shots']
-    feature_map_name = config['feature_map_name']
-    feature_map_entanglement = config['feature_map_entanglement']
-    FEATURE_MAP_DEPTH = config['feature_map_depth']
+    SEED : int = config['seed']
+    BATCH_SIZE : int = config['batch_size']
+    LEARNING_RATE : float = config['learning_rate']
+    EPOCHS : int = config['epochs']
+    NUM_QUBITS : int = config['num_qubits']
+    SHOTS : int | None = config['shots']
+    feature_map_name : str = config['feature_map_name']
+    feature_map_entanglement : str | List[List[int]] = \
+        config['feature_map_entanglement']
+    FEATURE_MAP_DEPTH : int = config['feature_map_depth']
     ansatz_name = config['ansatz_name']
-    ansatz_entanglement = config['ansatz_entanglement']
-    ANSATZ_DEPTH = config['ansatz_depth']
-    quanvolution_name = config['quanvolution_name']
-    QUANVOLUTION_OUT_CHANNELS = config['quanvolution_out_channels']
-    local = config['local']
-    dataset = config['dataset']
-    errors_names = config['errors_names']
-    errors_probabilities = config['errors_probabilities']
-    NUM_CLASSES = num_classes(dataset=dataset, local=local)
+    ansatz_entanglement :  str | List[List[int]] = \
+        config['ansatz_entanglement']
+    ANSATZ_DEPTH : int = config['ansatz_depth']
+    CONVOLUTION_OUT_CHANNELS : int = config['quanvolution_out_channels']
+    dataset_folder_name : str = config['dataset_folder_name']
+    error_name : str = config['error_name']
+    error_probability : float = config['error_probability']
+    hybrid : bool = config['hybrid']
     
     # Set random seed for reproducibility
     manual_seed(SEED)
@@ -43,38 +48,70 @@ def main(config: DictConfig) -> None:
     np.random.seed(SEED)
 
     # Load data
-    train_loader, validation_loader = load_dataset(
-                                            dataset=dataset,
-                                            batch_size=BATCH_SIZE,
-                                            local=local)
-    
-    # Define the noise classes, models and backends
-    noise = NoiseCreator(errors_names=errors_names,
-                         errors_probabilities=errors_probabilities)
+    train_loader, validation_loader, _ = load_dataset(
+        folder_name=dataset_folder_name,
+        batch_size=BATCH_SIZE,
+    )
 
-    # Create the models
-    models = ModelsCreator(
-             num_qubits=NUM_QUBITS,
-             shots=SHOTS,
-             feature_map_name=feature_map_name,
-             feature_map_depth=FEATURE_MAP_DEPTH,
-             feature_map_entanglement=feature_map_entanglement,
-             ansatz_name=ansatz_name,
-             ansatz_depth=ANSATZ_DEPTH,
-             ansatz_entanglement=ansatz_entanglement,
-             quanvolution_name=quanvolution_name,
-             quanvolution_out_channels=QUANVOLUTION_OUT_CHANNELS,
-             noise=noise,
-             local=local,
-             dataset=dataset)
+    # Create backend
+    backend : AerSimulator | None = create_backend(
+        error_name=error_name,
+        error_probability=error_probability,
+    )
 
-    # Perform training and validation of the models to be compared
-    results = Trainer(models_complete=models,
-                    train_loader=train_loader,
-                    validation_loader=validation_loader,
-                    loss_fn=loss_fn,
-                    epochs=EPOCHS,
-                    learning_rate=LEARNING_RATE,
-                    local=local)
+    # Create the quantum layer
+    qnn : QNN = QNN(
+        num_qubits=NUM_QUBITS,
+        feature_map_name=feature_map_name,
+        feature_map_depth=FEATURE_MAP_DEPTH,
+        feature_map_entanglement=feature_map_entanglement,
+        ansatz_name=ansatz_name,
+        ansatz_depth=ANSATZ_DEPTH,
+        ansatz_entanglement=ansatz_entanglement,
+        backend=backend,
+        shots=SHOTS
+    )
+
+    # Create the cnn
+    model : DataParallel[ClassicNet | HybridNet] = create_cnn(
+        hybrid=hybrid,
+        dataset_folder_name=dataset_folder_name,
+        train_set=train_loader,
+        kernel_size=int(np.sqrt(NUM_QUBITS)),
+        convolution_output_channels=CONVOLUTION_OUT_CHANNELS,
+        quantum_filter=qnn.qnn
+    )
+
+    # Define the loss
+    loss_fn : MSELoss | CrossEntropyLoss
+    if config['loss_function'] == 'MSE':
+        loss_fn = MSELoss()
+    elif config['loss_function'] == 'CrossEntropy':
+        loss_fn = CrossEntropyLoss()
+
+    # Train and validate the cnn
+    results : None | tuple[
+    list[Tensor | float],
+    list[Tensor | float],
+    list[Tensor | float],
+    list[Tensor | float],
+    list[Dict[str, Any]]
+    ] = train_and_validate(
+        model=model,
+        train_loader=train_loader,
+        validation_loader=validation_loader,
+        learning_rate=LEARNING_RATE,
+        loss_fn=loss_fn,
+        epochs=EPOCHS
+    )
+
+    # Plot the results
+    if not results == None:
+        plot_results(
+            avg_epoch_train_costs=results[0],
+            avg_epoch_train_accuracies=results[1],
+            avg_epoch_validation_costs=results[2],
+            avg_epoch_validation_accuracies=results[3]
+        )   
 
 if __name__ == "__main__": main()
