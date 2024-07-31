@@ -1,13 +1,15 @@
 from torch import Tensor
 import matplotlib.pyplot as plt
+from quantorch.src2.training2 import TrainingResult
 
-def plot_results(
-        avg_epoch_train_costs : list[Tensor | float],
-        avg_epoch_train_accuracies : list[Tensor | float],
-        avg_epoch_validation_costs : list[Tensor | float],
-        avg_epoch_validation_accuracies : list[Tensor | float],
-    ):
-      
+def plot_results(results : TrainingResult):
+    
+    avg_epoch_train_costs = results.avg_epoch_train_costs
+    avg_epoch_train_accuracies = results.avg_epoch_train_accuracies
+    avg_epoch_validation_costs = results.avg_epoch_validation_costs
+    avg_epoch_validation_accuracies = \
+        results.avg_epoch_validation_accuracies
+    
     plt.figure(figsize=(10, 12))  # Adjusting figure size for four subplots
 
     # Plotting the first subplot (train cost)
@@ -60,5 +62,3 @@ def plot_results(
 
     plt.tight_layout()
     plt.show()
-
-print()

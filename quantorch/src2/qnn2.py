@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from qiskit_machine_learning.circuit.library import QNNCircuit
 from qiskit_machine_learning.neural_networks import NeuralNetwork, SamplerQNN
 
@@ -32,12 +32,12 @@ class QNN:
             num_qubits: int,
             feature_map_name: str,
             feature_map_depth: int,
-            feature_map_entanglement: str | List[List[int]],
+            feature_map_entanglement: Union[str, List[List[int]]],
             ansatz_name: str,
             ansatz_depth: int,
-            ansatz_entanglement: str | List[List[int]],
-            backend: AerSimulator | None,
-            shots: int | None = None,
+            ansatz_entanglement: Union[str, List[List[int]]],
+            backend: Union[AerSimulator, None],
+            shots: Union[int, None] = None,
     ):
 
         self.num_qubits = num_qubits
@@ -113,5 +113,3 @@ class QNN:
                     )
             )
         return qnn
-    
-print()

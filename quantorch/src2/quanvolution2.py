@@ -1,7 +1,10 @@
 from torch import Tensor
 import torch.nn as nn
 from torch.nn import functional as F
+
 from qiskit_machine_learning.connectors import TorchConnector
+
+from typing import Union
 
 class Quanvolution(nn.Module):
     """
@@ -9,7 +12,7 @@ class Quanvolution(nn.Module):
     Attributes:
         quantum_filter (TorchConnector): Quantum filter for processing inputs.
         num_qubits (int): Number of qubits in the quantum filter.
-        out_channels (int | None): Number of output channels. Defaults to
+        out_channels (int or None): Number of output channels. Defaults to
             2**num_qubits
     """
     
@@ -17,7 +20,7 @@ class Quanvolution(nn.Module):
                  quantum_filter: TorchConnector,
                  stride : int,
                  padding : int,
-                 out_channels: int | None = None):
+                 out_channels: Union[int,None] = None):
         
         super(Quanvolution, self).__init__()
         self.quantum_filter = quantum_filter

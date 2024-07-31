@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Union
 
 from qiskit_machine_learning.neural_networks import NeuralNetwork
 from qiskit_machine_learning.connectors import TorchConnector
@@ -12,6 +13,7 @@ from torch.nn import (Conv2d,
                       Sequential,
                       Module,
                       DataParallel)
+from torch.utils.data import DataLoader
 
 from quantorch.src2.dataset2 import num_classes
 from quantorch.src2.quanvolution2 import Quanvolution
@@ -100,23 +102,23 @@ class HybridNet(Module):
         return self.net(x)
 
 def flatten_dimension(
-        train_set: Tensor,
+        train_loader: DataLoader,
         kernel_size: int,
         convolution_output_channels: int
     ) -> int:
     
-    # Determine the length of the kernel's side
-    k_length : int = int(np.sqrt(kernel_size))
-  
-    # Determine the length of the input image's side by
-    # looking at the training images
-    in_length : int = train_set.shape[2]
+    # Determine the width of the images
+    images, labels = next(iter(train_loader))
+    in_width : int = images.shape[3]
+    
+    # Determine the width of the kernel
+    k_width : int = int(np.sqrt(kernel_size))
 
-    # Determine the length of the output image's side
-    out_length : int = (in_length - k_length + 1)
+    # Determine the width of the output images
+    out_width : int = (in_width - k_width + 1)
 
     # Determine the number of pixels in each output image
-    out_pixels : int = out_length ** 2
+    out_pixels : int = out_width ** 2
 
     # Determine the total number of pixel
     flatten_size : int = out_pixels * convolution_output_channels
@@ -125,16 +127,16 @@ def flatten_dimension(
 
 def create_cnn(
     hybrid : bool,
-    train_set : Tensor,
+    train_loader : DataLoader,
     dataset_folder_name : str,
     kernel_size : int,
     convolution_output_channels : int,
     quantum_filter : NeuralNetwork,
-) -> DataParallel[HybridNet | ClassicNet]:
+) -> DataParallel[Union[HybridNet,ClassicNet]]:
     
     # Determine the number of input features of the classifier
     classifier_input_features : int = flatten_dimension(
-        train_set=train_set,
+        train_loader=train_loader,
         kernel_size=kernel_size,
         convolution_output_channels=convolution_output_channels
     )
@@ -154,7 +156,7 @@ def create_cnn(
         )
     else :
         model = ClassicNet(
-            kernel_size=kernel_size,
+            kernel_size=int(np.sqrt(kernel_size)),
             convolution_output_channels=convolution_output_channels,
             classifier_input_features=classifier_input_features,
             classifier_output_features=classifier_output_features

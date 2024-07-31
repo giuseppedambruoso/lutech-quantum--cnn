@@ -5,7 +5,9 @@ from qiskit_aer.noise import (
     phase_damping_error,
     QuantumError
 )
+
 from abc import ABC, abstractmethod
+from typing import Union
 
 class Noise(ABC):
     """
@@ -17,12 +19,6 @@ class Noise(ABC):
     """
 
     def __init__(self, error_probability: float) -> None:
-        """
-        Initialize the Noise class with a given error probability.
-
-        Args:
-            error_probability (float): The probability of error in the noise model.
-        """
         self.error_probability = error_probability
         self.backend = self._create_backend()
 
@@ -87,6 +83,12 @@ class DepolarizingNoise(Noise):
         """
         return depolarizing_error(self.error_probability * 4 / 3, num_qubits=1)
 
+    def _create_noise_model(self) -> NoiseModel:
+        return super()._create_noise_model()
+    
+    def _create_backend(self) -> AerSimulator:
+        return super()._create_backend()
+
 class DephasingNoise(Noise):
     """
     Class for creating dephasing noise models.
@@ -108,21 +110,30 @@ class DephasingNoise(Noise):
         Returns:
             QuantumError: The dephasing quantum error.
         """
-        return phase_damping_error(self.error_probability * 4 / 3, num_qubits=1)
+        return phase_damping_error(self.error_probability * 4 / 3)
+
+    def _create_noise_model(self) -> NoiseModel:
+        return super()._create_noise_model()
+    
+    def _create_backend(self) -> AerSimulator:
+        return super()._create_backend()
 
 def create_backend(
-    error_name: str | None,
+    error_name: Union[str,None],
     error_probability: float
-) -> AerSimulator | None:
+) -> Union[AerSimulator,None]:
     """
-    Create an AerSimulator backend with the specified noise model.
+    This function creates an AerSimulator backend with the specified noise\
+        model.
 
     Args:
-        error_name (Union[str, None]): The type of error model ('depolarizing' or 'dephasing'). If None, no noise model is applied.
+        error_name (Union[str, None]): The type of error model ('depolarizing'\
+            or 'dephasing'). If None, no noise model is applied.
         error_probability (float): The probability of error in the noise model.
 
     Returns:
-        Union[AerSimulator, None]: The AerSimulator backend with the specified noise model, or None if no noise model is applied.
+        Union[AerSimulator, None]: The AerSimulator backend with the specified\
+            noise model, or None if no noise model is applied.
     """
     if error_name == 'depolarizing':
         error = DepolarizingNoise(error_probability=error_probability)
@@ -133,8 +144,7 @@ def create_backend(
     elif error_name is None:
         backend = None
     else:
-        raise ValueError("error_name can be either 'depolarizing' or 'dephasing'!")
+        raise ValueError("error_name can be either \
+                         'depolarizing' or 'dephasing'!")
     
     return backend
-
-print()
