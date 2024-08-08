@@ -12,11 +12,12 @@ ansatz_depth: 1
 ansatz_entanglement : 'linear'
 shots: Null
 quanvolution_name : 'quanvolution_sampler'
-quanvolution_out_channels: Null
-errors_names: ['depolarizing']
-errors_probabilities: [1]
-local: False
-dataset: 'Tetris'
+convolution_out_channels: 16
+error_name: 'dephasing'
+error_probability: 0.01
+dataset_folder_path: 'Tetris'
+hybrid: True
+csv_path: '1%.csv'
 hydra:
   sweep:
     dir: multirun
