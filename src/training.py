@@ -183,7 +183,7 @@ class Trainer:
                             + " "
                             + "VALIDATION: "
                             + str(batch_index + 1)
-                            + "/160 TIME: "
+                            + "/1 TIME: "
                             + str(val_time)
                             + "s",
                             end=''
