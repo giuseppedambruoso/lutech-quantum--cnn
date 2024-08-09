@@ -30,7 +30,7 @@ Giuseppe D'Ambruoso (Lutech S.p.A.)
 ## Acknowledgements
 This library was realized with the indinspensable help of dr. Dario del Sorbo
 (Lutech S.p.A.), dr. Claudio Basilio Caporusso (Lutech S.p.A.) dr. Ivan
-Palmisano (Lutech S.p.A.) and dr. Giuseppe Lamanna (Lutech S.p.A.). We acknowledge also the support from the whole Lutech R&D 'MILE' pole, directed by dr. Giuseppe Ieva.
+Palmisano (Lutech S.p.A.) and dr. Giuseppe Lamanna (Lutech S.p.A.). We acknowledge also the support from the whole Lutech R&D 'MILE' pole, directed by dr. Giuseppe Ieva (Lutech S.p.A.)
 
 ## References
 [1] Liu et al. (2021). _Hybrid quantum-classical convolutional neural networks_. Science China Physics, Mechanics &amp; Astronomy. DOI: 10.1007/s11433-021-1734-3. url: http://dx.doi.org/10.1007/s11433-021-1734-3.
