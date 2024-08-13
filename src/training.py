@@ -136,10 +136,12 @@ class Trainer:
                         + " "
                         + "TRAIN: "
                         + str(batch_index + 1)
-                        + "/16 TIME: "
+                        + "/"
+                        + str(len(self.train_loader))
+                        + " TIME: "
                         + str(train_time)
                         + "s",
-                        end=''
+                        end="",
                     )
 
                 model.eval()
@@ -147,9 +149,6 @@ class Trainer:
                     for batch_index, (inputs, labels) in enumerate(
                         self.validation_loader
                     ):
-                        # Start recording time
-                        start_val_time = time.time()
-
                         output = model(inputs)
 
                         # Compute cost function
@@ -171,10 +170,6 @@ class Trainer:
                         epoch_validation_costs.append(validation_cost_fn)
                         epoch_validation_accuracies.append(validation_accuracy)
 
-                        # End recording time and compute total time
-                        end_val_time = time.time()
-                        val_time = end_val_time - end_val_time
-
                         print(
                             "\r\033[KEPOCH: "
                             + str(epoch + 1)
@@ -183,10 +178,9 @@ class Trainer:
                             + " "
                             + "VALIDATION: "
                             + str(batch_index + 1)
-                            + "/1 TIME: "
-                            + str(val_time)
-                            + "s",
-                            end=''
+                            + "/"
+                            + str(len(self.validation_loader)),
+                            end="",
                         )
 
                 # Compute epoch averages for graphical representation
@@ -203,14 +197,14 @@ class Trainer:
 
                 # Record the model's parameters
                 results.models.append(model.state_dict())
-
+                
                 if (
-                    avg_epoch_train_cost is Tensor
-                    and avg_epoch_train_accuracy is Tensor
-                    and avg_epoch_validation_cost is Tensor
-                    and avg_epoch_validation_accuracy is Tensor
+                    type(avg_epoch_train_cost) == Tensor
+                    and type(avg_epoch_train_accuracy) == Tensor
+                    and type(avg_epoch_validation_cost) == Tensor
+                    and type(avg_epoch_validation_accuracy) == Tensor
                 ):
-
+                    
                     # Record training metrics
                     results.avg_epoch_train_costs.append(avg_epoch_train_cost.detach())
                     results.avg_epoch_train_accuracies.append(
@@ -233,5 +227,4 @@ class Trainer:
                             avg_epoch_validation_accuracy.item(),
                         ]
                     )
-
         return results
