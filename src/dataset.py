@@ -221,7 +221,7 @@ def load_dataset(
     )
     validation_loader = DataLoader(
         dataset=validation_dataset,
-        batch_size=160,
+        batch_size=len(validation_dataset),
         shuffle=False,
         pin_memory=True,
         num_workers=os.cpu_count(),
@@ -229,7 +229,7 @@ def load_dataset(
     )
     test_loader = DataLoader(
         dataset=test_dataset,
-        batch_size=200,
+        batch_size=len(test_dataset),
         shuffle=False,
         pin_memory=True,
         num_workers=os.cpu_count(),
