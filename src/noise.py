@@ -37,7 +37,6 @@ class Noise(ABC):
     def _create_noise_class(self) -> QuantumError:
         pass
 
-    @abstractmethod
     def _create_noise_model(self) -> NoiseModel:
         noise_class = self._create_noise_class()
         noise_model = NoiseModel()
@@ -46,7 +45,6 @@ class Noise(ABC):
         )
         return noise_model
 
-    @abstractmethod
     def _create_backend(self) -> AerSimulator:
         noise_model = self._create_noise_model()
         backend = AerSimulator(noise_model=noise_model)
@@ -79,12 +77,6 @@ class DepolarizingNoise(Noise):
     def _create_noise_class(self) -> QuantumError:
         return depolarizing_error(self.error_probability * 4 / 3, num_qubits=1)
 
-    def _create_noise_model(self) -> NoiseModel:
-        return super()._create_noise_model()
-
-    def _create_backend(self) -> AerSimulator:
-        return super()._create_backend()
-
 
 class DephasingNoise(Noise):
     """
@@ -111,12 +103,6 @@ class DephasingNoise(Noise):
 
     def _create_noise_class(self) -> QuantumError:
         return phase_damping_error(1-(1-self.error_probability)**2)
-
-    def _create_noise_model(self) -> NoiseModel:
-        return super()._create_noise_model()
-
-    def _create_backend(self) -> AerSimulator:
-        return super()._create_backend()
 
 
 def create_backend(
