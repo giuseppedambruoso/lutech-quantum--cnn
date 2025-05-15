@@ -15,7 +15,7 @@ The parameters update of the whole net is performed by means of the mini-batch g
 
 The whole model is inspired to that proposed by Junhua Liu [1].
 
-Users have to possibility to decide wether to make the execution of the VQC contained within the filter noiseless or noisy. Moreover, they can choose to introduce one or more noise models, each one with an arbitary probability.
+Users have to possibility to decide whether to execution the VQC contained within the filter with or without quantum noise. Moreover, they can choose to introduce one or more noise models.
 
 ## Usage
 To use the library, follow the steps below.
@@ -25,10 +25,10 @@ To use the library, follow the steps below.
 A default 4-class synthetic dataset of 3x3 images, called 'Tetris', is placed in the root directory of the library. This dataset is composed of 640 training images, 160 validation images and 200 test images. Each image represent a tetris brick. The grey value of the brick pixels is randomly chosen between 0.7 and 1, whereas that of the background pixels between 0 and 0.3.
 
 ## Author
-Giuseppe D'Ambruoso (Lutech S.p.A.).
+Giuseppe D'Ambruoso (Lutech S.p.A., University of Bari Aldo Moro).
 
 ## Acknowledgements
-This library was realized with the indinspensable help of dr. Dario del Sorbo (Lutech S.p.A.), dr. Claudio Basilio Caporusso (Lutech S.p.A.) dr. Ivan Palmisano (Lutech S.p.A.), dr. Giuseppe Lamanna (Lutech S.p.A.) and prof. dr. Giovanni Gramegna (Università di Bari Aldo Moro). We acknowledge also the support from the whole Lutech R&D 'MILE' pole, directed by dr. Giuseppe Ieva (Lutech S.p.A.).
+This library was realized with the indinspensable help of dr. Dario del Sorbo (Lutech S.p.A.), dr. Claudio Basilio Caporusso (Lutech S.p.A.), dr. Ivan Palmisano (Lutech S.p.A.), dr. Giuseppe Lamanna (Lutech S.p.A.) and prof. dr. Giovanni Gramegna (University of Bari Aldo Moro). We acknowledge also the support from the whole Lutech R&D 'MILE' pole, directed by dr. Giuseppe Ieva (Lutech S.p.A.).
 
 ## References
 [1] Liu et al. (2021). _Hybrid quantum-classical convolutional neural networks_. Science China Physics, Mechanics &amp; Astronomy. DOI: 10.1007/s11433-021-1734-3. url: http://dx.doi.org/10.1007/s11433-021-1734-3.
