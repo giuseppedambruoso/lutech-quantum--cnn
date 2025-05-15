@@ -16,105 +16,75 @@ Users have to possibility to decide wether to make the execution of the VQC cont
 """
 
 # Import necessary libraries
-from src.dataset import load_dataset
-from src.noise import create_backend
-from src.qnn import QNN
-from src.net import create_cnn
-from src.plot import plot_results
-from src.training import Trainer
+from src_pennylane.dataset import load_dataset, num_classes
+from src_pennylane.net import create_cnn
+from src_pennylane.plot import plot_results
+from src_pennylane.training import Trainer
 
-from torch import manual_seed
 from torch.nn import MSELoss, CrossEntropyLoss
 
-import random
-import numpy as np
 import hydra
 from omegaconf import DictConfig
 from typing import Union
+from torch import manual_seed
+import pennylane as qml
 
-import logging
-
-logging.getLogger("qiskit").setLevel(logging.CRITICAL)
-
+manual_seed(42)
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(config: DictConfig) -> None:
     # Define configuration
-    SEED = config["seed"]
-    BATCH_SIZE = config["batch_size"]
-    LEARNING_RATE = config["learning_rate"]
-    EPOCHS = config["epochs"]
-    NUM_QUBITS = config["num_qubits"]
-    SHOTS = config["shots"]
-    feature_map_name = config["feature_map_name"]
-    feature_map_entanglement = config["feature_map_entanglement"]
-    FEATURE_MAP_DEPTH = config["feature_map_depth"]
-    ansatz_name = config["ansatz_name"]
-    ansatz_entanglement = config["ansatz_entanglement"]
-    ANSATZ_DEPTH = config["ansatz_depth"]
-    CONVOLUTION_OUT_CHANNELS = config["convolution_out_channels"]
-    dataset_folder_path = config["dataset_folder_path"]
-    error_name = config["error_name"]
-    error_probability = config["error_probability"]
     hybrid = config["hybrid"]
+    dataset_folder_path = config["dataset_folder_path"]
+    BATCH_SIZE = config["batch_size"]
+    KERNEL_SIZE = config["kernel_size"]
+    device = qml.device("default.qubit")
+    feature_map = config["feature_map"]
+    ansatz = config["ansatz"]
+    FEATURE_MAP_REPS = config["feature_map_reps"]
+    ANSATZ_REPS = config["ansatz_reps"]
+    CLASSES : int = num_classes(dataset_folder_path=dataset_folder_path)
+    show_circuit = config["show_circuit"]
+    loss_fn : Union[MSELoss, CrossEntropyLoss] = \
+        MSELoss() if config["loss_function"] == "MSE" \
+        else CrossEntropyLoss()
+    EPOCHS = config["epochs"]
+    LEARNING_RATE = config["learning_rate"]
     csv_path = config["csv_path"]
 
     # Set random seed for reproducibility
-    manual_seed(SEED)
-    random.seed(SEED)
-    np.random.seed(SEED)
+    manual_seed(42)
 
     # Load data
-    train_loader, validation_loader, _ = load_dataset(
+    train_loader, test_loader, _ = load_dataset(
         dataset_folder_path=dataset_folder_path,
-        batch_size=BATCH_SIZE,
-    )
-
-    # Create the backend
-    backend = create_backend(
-        error_name=error_name,
-        error_probability=error_probability,
-    )
-
-    # Create the quantum layer
-    qnn = QNN(
-        num_qubits=NUM_QUBITS,
-        feature_map_name=feature_map_name,
-        feature_map_depth=FEATURE_MAP_DEPTH,
-        feature_map_entanglement=feature_map_entanglement,
-        ansatz_name=ansatz_name,
-        ansatz_depth=ANSATZ_DEPTH,
-        ansatz_entanglement=ansatz_entanglement,
-        backend=backend,
-        shots=SHOTS,
+        batch_size=BATCH_SIZE
     )
 
     # Create the cnn
     model = create_cnn(
-        hybrid=hybrid,
-        dataset_folder_path=dataset_folder_path,
-        train_loader=train_loader,
-        kernel_size=NUM_QUBITS,
-        convolution_output_channels=CONVOLUTION_OUT_CHANNELS,
-        quantum_filter=qnn.qnn,
+        hybrid = hybrid,
+        train_loader = test_loader,
+        dataset_folder_path = dataset_folder_path,
+        kernel_size = KERNEL_SIZE,
+        device = device,
+        feature_map = feature_map,
+        ansatz = ansatz,
+        feature_map_reps = FEATURE_MAP_REPS,
+        ansatz_reps = ANSATZ_REPS,
+        classes = CLASSES,
+        show_circuit = show_circuit,
     )
-
-    # Define the loss function
-    loss_fn: Union[MSELoss, CrossEntropyLoss]
-    if config["loss_function"] == "MSE":
-        loss_fn = MSELoss()
-    elif config["loss_function"] == "CrossEntropy":
-        loss_fn = CrossEntropyLoss()
 
     # Perform training and validation of the model
     trainer = Trainer(
         model=model,
         train_loader=train_loader,
-        validation_loader=validation_loader,
+        test_loader=test_loader,
         loss_fn=loss_fn,
         epochs=EPOCHS,
         learning_rate=LEARNING_RATE,
-        csv_path=csv_path,
+        csv_path=csv_path
     )
 
     # Get results
