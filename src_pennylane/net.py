@@ -1,4 +1,3 @@
-import numpy as np
 import pennylane as qml
 from typing import Union
 
@@ -13,8 +12,7 @@ from torch.nn import (
     Flatten,
     Softmax,
     Sequential,
-    Module,
-    DataParallel,
+    Module
 )
 from torch.utils.data import DataLoader
 
@@ -39,14 +37,14 @@ class ClassicNet(Module):
         self.classifier_input_features = classifier_input_features
         self.classifier_output_features = classifier_output_features
 
-        convolution = Conv2d(
+        self.convolution = Conv2d(
             in_channels=1,
             out_channels=self.convolution_output_channels,
             kernel_size=kernel_size
         )
 
         self.net = Sequential(
-            convolution,
+            self.convolution,
             ReLU(),
             Flatten(),
             Linear(
@@ -56,7 +54,9 @@ class ClassicNet(Module):
             Softmax(dim=1)
         )
 
+        self.prob = None
     def forward(self, x: Tensor) -> Tensor:
+        # print('Model parameters:', self.convolution.state_dict())
         return self.net(x)
 
 
@@ -68,6 +68,8 @@ class HybridNet(Module):
     def __init__(
         self,
         device: qml.devices,
+        noise: str | None,
+        noise_prob: float | None,
         feature_map: str,
         ansatz: str,
         feature_map_reps: int,
@@ -79,8 +81,12 @@ class HybridNet(Module):
     ):
         super(HybridNet, self).__init__()
 
+        self.prob = noise_prob
+        
         self.quanvolution = Quanvolution(
             device=device,
+            noise=noise,
+            noise_prob=noise_prob,
             feature_map=feature_map,
             ansatz=ansatz,
             feature_map_reps=feature_map_reps,
@@ -96,10 +102,11 @@ class HybridNet(Module):
                 in_features=classifier_input_features,
                 out_features=classifier_output_features,
             ),
-            Softmax(dim=1),
+            Softmax(dim=1)
         )
 
     def forward(self, x: Tensor) -> Tensor:
+        # print('Model parameters:', self.quanvolution.state_dict())
         return self.net(x)
 
 
@@ -118,35 +125,36 @@ def flatten_dimension(
 
     # Determine the width of the kernel
     k_width: int = int(kernel_size)
-    print('Kernel size:', k_width)
+#    print('Kernel size:', k_width)
 
     # Determine the width of the output images
     out_width: int = int(in_width - k_width + 1)
 
     # Determine the number of pixels in each output image
     out_pixels: int = int(out_width * out_width)
-    print('Output image size:', out_pixels)
+#    print('Output image size:', out_pixels)
 
     # Determine the total number of pixel
     flatten_size: int = out_pixels * convolution_output_channels
-    print('Flatten size:', flatten_size)
+#    print('Flatten size:', flatten_size)
 
     return flatten_size
 
 
 def create_cnn(
-    hybrid: bool,
     train_loader: DataLoader,
     dataset_folder_path: str,
     kernel_size: int,
     device: qml.devices,
+    noise: str | None,
+    noise_prob: float | None,
     feature_map: str,
     ansatz: str,
     feature_map_reps: int,
     ansatz_reps: int,
     classes: int,
     show_circuit: bool = False,
-) -> DataParallel[Union[HybridNet, ClassicNet]]:
+) -> Union[HybridNet, ClassicNet]:
     """Create either a classical or a hybrid convolutional neural network
     composed of a single convolutional layer, a single dense layer.
     """
@@ -167,9 +175,18 @@ def create_cnn(
 
     # Create either the classical or the hybrid cnn
     model: Module
-    if hybrid == True:
+    if noise_prob is None:
+        model = ClassicNet(
+            kernel_size=kernel_size,
+            convolution_output_channels=convolution_output_channels,
+            classifier_input_features=classifier_input_features,
+            classifier_output_features=classifier_output_features,
+        )
+    else:
         model = HybridNet(
         device = device,
+        noise = noise,
+        noise_prob = noise_prob,
         feature_map = feature_map,
         ansatz = ansatz,
         feature_map_reps = feature_map_reps,
@@ -178,13 +195,6 @@ def create_cnn(
         classifier_input_features = classifier_input_features,
         classifier_output_features = classes,
         show_circuit = show_circuit
-    )    
-    else:
-        model = ClassicNet(
-            kernel_size=kernel_size,
-            convolution_output_channels=convolution_output_channels,
-            classifier_input_features=classifier_input_features,
-            classifier_output_features=classifier_output_features,
-        )
+    )
 
-    return DataParallel(model)
+    return model
