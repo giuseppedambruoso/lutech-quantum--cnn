@@ -1,8 +1,9 @@
 import pennylane as qml
+from pennylane.devices.device_api import Device
 from typing import Union
 
-from src_pennylane.dataset import num_classes
-from src_pennylane.quanvolution import Quanvolution
+from lutech_quantum_cnn.dataset import num_classes
+from lutech_quantum_cnn.quanvolution import Quanvolution
 
 from torch import Tensor, manual_seed
 from torch.nn import (
@@ -67,7 +68,7 @@ class HybridNet(Module):
 
     def __init__(
         self,
-        device: qml.devices,
+        device: Device,
         noise: str | None,
         noise_prob: float | None,
         feature_map: str,
@@ -145,7 +146,7 @@ def create_cnn(
     train_loader: DataLoader,
     dataset_folder_path: str,
     kernel_size: int,
-    device: qml.devices,
+    device: Device | None,
     noise: str | None,
     noise_prob: float | None,
     feature_map: str,
@@ -175,7 +176,7 @@ def create_cnn(
 
     # Create either the classical or the hybrid cnn
     model: Module
-    if noise_prob is None:
+    if noise is None or noise_prob is None or device is None:
         model = ClassicNet(
             kernel_size=kernel_size,
             convolution_output_channels=convolution_output_channels,
@@ -184,17 +185,17 @@ def create_cnn(
         )
     else:
         model = HybridNet(
-        device = device,
-        noise = noise,
-        noise_prob = noise_prob,
-        feature_map = feature_map,
-        ansatz = ansatz,
-        feature_map_reps = feature_map_reps,
-        ansatz_reps=ansatz_reps,
-        qfilter_size=kernel_size,
-        classifier_input_features = classifier_input_features,
-        classifier_output_features = classes,
-        show_circuit = show_circuit
-    )
+            device = device,
+            noise = noise,
+            noise_prob = noise_prob,
+            feature_map = feature_map,
+            ansatz = ansatz,
+            feature_map_reps = feature_map_reps,
+            ansatz_reps=ansatz_reps,
+            qfilter_size=kernel_size,
+            classifier_input_features = classifier_input_features,
+            classifier_output_features = classes,
+            show_circuit = show_circuit
+        )
 
     return model

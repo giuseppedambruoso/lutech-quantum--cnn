@@ -4,7 +4,7 @@ import time
 from typing import List, Any, Dict, Union
 from dataclasses import dataclass
 
-from src_pennylane.net import ClassicNet, HybridNet
+from lutech_quantum_cnn.net import ClassicNet, HybridNet
 
 from torch import Tensor, no_grad, argmax, manual_seed
 from torch import max as torch_max

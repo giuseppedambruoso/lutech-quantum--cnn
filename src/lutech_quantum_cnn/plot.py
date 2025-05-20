@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import os
-from src_pennylane.training import TrainingResult
+from lutech_quantum_cnn.training import TrainingResult
 
 def plot_results(results: TrainingResult):
     """Plot the results of training and test, saving each plot individually as a PDF

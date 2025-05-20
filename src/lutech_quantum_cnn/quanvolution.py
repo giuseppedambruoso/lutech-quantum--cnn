@@ -1,5 +1,5 @@
 import numpy as np
-from src_pennylane.operations import RealAmplitudes, AngleEmbedding
+from lutech_quantum_cnn.operations import RealAmplitudes, AngleEmbedding
 
 import pennylane as qml
 from pennylane.measurements import ProbabilityMP
@@ -7,6 +7,7 @@ from pennylane.qnn import TorchLayer
 from pennylane.typing import TensorLike
 from pennylane.ops.channel import DepolarizingChannel
 from pennylane.ops.qubit.parametric_ops_multi_qubit import IsingZZ
+from pennylane.devices.device_api import Device
 
 from torch import Tensor, manual_seed
 import torch.nn as nn
@@ -92,7 +93,7 @@ class Quanvolution(nn.Module):
 
     def __init__(
         self,
-        device: qml.devices,
+        device: Device,
         noise: str | None,
         noise_prob: float | None,
         feature_map: str,

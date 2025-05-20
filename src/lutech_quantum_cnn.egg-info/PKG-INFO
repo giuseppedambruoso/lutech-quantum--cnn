@@ -1,0 +1,565 @@
+Metadata-Version: 2.4
+Name: lutech-quantum-cnn
+Version: 0.1.1
+Summary: A quantum convolutional neural network library.
+Author-email: Giuseppe <github.crayfish163@passinbox.com>
+Maintainer-email: Giuseppe <github.crayfish163@passinbox.com>
+License: Attribution 4.0 International
+        
+        =======================================================================
+        
+        Creative Commons Corporation ("Creative Commons") is not a law firm and
+        does not provide legal services or legal advice. Distribution of
+        Creative Commons public licenses does not create a lawyer-client or
+        other relationship. Creative Commons makes its licenses and related
+        information available on an "as-is" basis. Creative Commons gives no
+        warranties regarding its licenses, any material licensed under their
+        terms and conditions, or any related information. Creative Commons
+        disclaims all liability for damages resulting from their use to the
+        fullest extent possible.
+        
+        Using Creative Commons Public Licenses
+        
+        Creative Commons public licenses provide a standard set of terms and
+        conditions that creators and other rights holders may use to share
+        original works of authorship and other material subject to copyright
+        and certain other rights specified in the public license below. The
+        following considerations are for informational purposes only, are not
+        exhaustive, and do not form part of our licenses.
+        
+             Considerations for licensors: Our public licenses are
+             intended for use by those authorized to give the public
+             permission to use material in ways otherwise restricted by
+             copyright and certain other rights. Our licenses are
+             irrevocable. Licensors should read and understand the terms
+             and conditions of the license they choose before applying it.
+             Licensors should also secure all rights necessary before
+             applying our licenses so that the public can reuse the
+             material as expected. Licensors should clearly mark any
+             material not subject to the license. This includes other CC-
+             licensed material, or material used under an exception or
+             limitation to copyright. More considerations for licensors:
+        	wiki.creativecommons.org/Considerations_for_licensors
+        
+             Considerations for the public: By using one of our public
+             licenses, a licensor grants the public permission to use the
+             licensed material under specified terms and conditions. If
+             the licensor's permission is not necessary for any reason--for
+             example, because of any applicable exception or limitation to
+             copyright--then that use is not regulated by the license. Our
+             licenses grant only permissions under copyright and certain
+             other rights that a licensor has authority to grant. Use of
+             the licensed material may still be restricted for other
+             reasons, including because others have copyright or other
+             rights in the material. A licensor may make special requests,
+             such as asking that all changes be marked or described.
+             Although not required by our licenses, you are encouraged to
+             respect those requests where reasonable. More_considerations
+             for the public:
+        	wiki.creativecommons.org/Considerations_for_licensees
+        
+        =======================================================================
+        
+        Creative Commons Attribution 4.0 International Public License
+        
+        By exercising the Licensed Rights (defined below), You accept and agree
+        to be bound by the terms and conditions of this Creative Commons
+        Attribution 4.0 International Public License ("Public License"). To the
+        extent this Public License may be interpreted as a contract, You are
+        granted the Licensed Rights in consideration of Your acceptance of
+        these terms and conditions, and the Licensor grants You such rights in
+        consideration of benefits the Licensor receives from making the
+        Licensed Material available under these terms and conditions.
+        
+        
+        Section 1 -- Definitions.
+        
+          a. Adapted Material means material subject to Copyright and Similar
+             Rights that is derived from or based upon the Licensed Material
+             and in which the Licensed Material is translated, altered,
+             arranged, transformed, or otherwise modified in a manner requiring
+             permission under the Copyright and Similar Rights held by the
+             Licensor. For purposes of this Public License, where the Licensed
+             Material is a musical work, performance, or sound recording,
+             Adapted Material is always produced where the Licensed Material is
+             synched in timed relation with a moving image.
+        
+          b. Adapter's License means the license You apply to Your Copyright
+             and Similar Rights in Your contributions to Adapted Material in
+             accordance with the terms and conditions of this Public License.
+        
+          c. Copyright and Similar Rights means copyright and/or similar rights
+             closely related to copyright including, without limitation,
+             performance, broadcast, sound recording, and Sui Generis Database
+             Rights, without regard to how the rights are labeled or
+             categorized. For purposes of this Public License, the rights
+             specified in Section 2(b)(1)-(2) are not Copyright and Similar
+             Rights.
+        
+          d. Effective Technological Measures means those measures that, in the
+             absence of proper authority, may not be circumvented under laws
+             fulfilling obligations under Article 11 of the WIPO Copyright
+             Treaty adopted on December 20, 1996, and/or similar international
+             agreements.
+        
+          e. Exceptions and Limitations means fair use, fair dealing, and/or
+             any other exception or limitation to Copyright and Similar Rights
+             that applies to Your use of the Licensed Material.
+        
+          f. Licensed Material means the artistic or literary work, database,
+             or other material to which the Licensor applied this Public
+             License.
+        
+          g. Licensed Rights means the rights granted to You subject to the
+             terms and conditions of this Public License, which are limited to
+             all Copyright and Similar Rights that apply to Your use of the
+             Licensed Material and that the Licensor has authority to license.
+        
+          h. Licensor means the individual(s) or entity(ies) granting rights
+             under this Public License.
+        
+          i. Share means to provide material to the public by any means or
+             process that requires permission under the Licensed Rights, such
+             as reproduction, public display, public performance, distribution,
+             dissemination, communication, or importation, and to make material
+             available to the public including in ways that members of the
+             public may access the material from a place and at a time
+             individually chosen by them.
+        
+          j. Sui Generis Database Rights means rights other than copyright
+             resulting from Directive 96/9/EC of the European Parliament and of
+             the Council of 11 March 1996 on the legal protection of databases,
+             as amended and/or succeeded, as well as other essentially
+             equivalent rights anywhere in the world.
+        
+          k. You means the individual or entity exercising the Licensed Rights
+             under this Public License. Your has a corresponding meaning.
+        
+        
+        Section 2 -- Scope.
+        
+          a. License grant.
+        
+               1. Subject to the terms and conditions of this Public License,
+                  the Licensor hereby grants You a worldwide, royalty-free,
+                  non-sublicensable, non-exclusive, irrevocable license to
+                  exercise the Licensed Rights in the Licensed Material to:
+        
+                    a. reproduce and Share the Licensed Material, in whole or
+                       in part; and
+        
+                    b. produce, reproduce, and Share Adapted Material.
+        
+               2. Exceptions and Limitations. For the avoidance of doubt, where
+                  Exceptions and Limitations apply to Your use, this Public
+                  License does not apply, and You do not need to comply with
+                  its terms and conditions.
+        
+               3. Term. The term of this Public License is specified in Section
+                  6(a).
+        
+               4. Media and formats; technical modifications allowed. The
+                  Licensor authorizes You to exercise the Licensed Rights in
+                  all media and formats whether now known or hereafter created,
+                  and to make technical modifications necessary to do so. The
+                  Licensor waives and/or agrees not to assert any right or
+                  authority to forbid You from making technical modifications
+                  necessary to exercise the Licensed Rights, including
+                  technical modifications necessary to circumvent Effective
+                  Technological Measures. For purposes of this Public License,
+                  simply making modifications authorized by this Section 2(a)
+                  (4) never produces Adapted Material.
+        
+               5. Downstream recipients.
+        
+                    a. Offer from the Licensor -- Licensed Material. Every
+                       recipient of the Licensed Material automatically
+                       receives an offer from the Licensor to exercise the
+                       Licensed Rights under the terms and conditions of this
+                       Public License.
+        
+                    b. No downstream restrictions. You may not offer or impose
+                       any additional or different terms or conditions on, or
+                       apply any Effective Technological Measures to, the
+                       Licensed Material if doing so restricts exercise of the
+                       Licensed Rights by any recipient of the Licensed
+                       Material.
+        
+               6. No endorsement. Nothing in this Public License constitutes or
+                  may be construed as permission to assert or imply that You
+                  are, or that Your use of the Licensed Material is, connected
+                  with, or sponsored, endorsed, or granted official status by,
+                  the Licensor or others designated to receive attribution as
+                  provided in Section 3(a)(1)(A)(i).
+        
+          b. Other rights.
+        
+               1. Moral rights, such as the right of integrity, are not
+                  licensed under this Public License, nor are publicity,
+                  privacy, and/or other similar personality rights; however, to
+                  the extent possible, the Licensor waives and/or agrees not to
+                  assert any such rights held by the Licensor to the limited
+                  extent necessary to allow You to exercise the Licensed
+                  Rights, but not otherwise.
+        
+               2. Patent and trademark rights are not licensed under this
+                  Public License.
+        
+               3. To the extent possible, the Licensor waives any right to
+                  collect royalties from You for the exercise of the Licensed
+                  Rights, whether directly or through a collecting society
+                  under any voluntary or waivable statutory or compulsory
+                  licensing scheme. In all other cases the Licensor expressly
+                  reserves any right to collect such royalties.
+        
+        
+        Section 3 -- License Conditions.
+        
+        Your exercise of the Licensed Rights is expressly made subject to the
+        following conditions.
+        
+          a. Attribution.
+        
+               1. If You Share the Licensed Material (including in modified
+                  form), You must:
+        
+                    a. retain the following if it is supplied by the Licensor
+                       with the Licensed Material:
+        
+                         i. identification of the creator(s) of the Licensed
+                            Material and any others designated to receive
+                            attribution, in any reasonable manner requested by
+                            the Licensor (including by pseudonym if
+                            designated);
+        
+                        ii. a copyright notice;
+        
+                       iii. a notice that refers to this Public License;
+        
+                        iv. a notice that refers to the disclaimer of
+                            warranties;
+        
+                         v. a URI or hyperlink to the Licensed Material to the
+                            extent reasonably practicable;
+        
+                    b. indicate if You modified the Licensed Material and
+                       retain an indication of any previous modifications; and
+        
+                    c. indicate the Licensed Material is licensed under this
+                       Public License, and include the text of, or the URI or
+                       hyperlink to, this Public License.
+        
+               2. You may satisfy the conditions in Section 3(a)(1) in any
+                  reasonable manner based on the medium, means, and context in
+                  which You Share the Licensed Material. For example, it may be
+                  reasonable to satisfy the conditions by providing a URI or
+                  hyperlink to a resource that includes the required
+                  information.
+        
+               3. If requested by the Licensor, You must remove any of the
+                  information required by Section 3(a)(1)(A) to the extent
+                  reasonably practicable.
+        
+               4. If You Share Adapted Material You produce, the Adapter's
+                  License You apply must not prevent recipients of the Adapted
+                  Material from complying with this Public License.
+        
+        
+        Section 4 -- Sui Generis Database Rights.
+        
+        Where the Licensed Rights include Sui Generis Database Rights that
+        apply to Your use of the Licensed Material:
+        
+          a. for the avoidance of doubt, Section 2(a)(1) grants You the right
+             to extract, reuse, reproduce, and Share all or a substantial
+             portion of the contents of the database;
+        
+          b. if You include all or a substantial portion of the database
+             contents in a database in which You have Sui Generis Database
+             Rights, then the database in which You have Sui Generis Database
+             Rights (but not its individual contents) is Adapted Material; and
+        
+          c. You must comply with the conditions in Section 3(a) if You Share
+             all or a substantial portion of the contents of the database.
+        
+        For the avoidance of doubt, this Section 4 supplements and does not
+        replace Your obligations under this Public License where the Licensed
+        Rights include other Copyright and Similar Rights.
+        
+        
+        Section 5 -- Disclaimer of Warranties and Limitation of Liability.
+        
+          a. UNLESS OTHERWISE SEPARATELY UNDERTAKEN BY THE LICENSOR, TO THE
+             EXTENT POSSIBLE, THE LICENSOR OFFERS THE LICENSED MATERIAL AS-IS
+             AND AS-AVAILABLE, AND MAKES NO REPRESENTATIONS OR WARRANTIES OF
+             ANY KIND CONCERNING THE LICENSED MATERIAL, WHETHER EXPRESS,
+             IMPLIED, STATUTORY, OR OTHER. THIS INCLUDES, WITHOUT LIMITATION,
+             WARRANTIES OF TITLE, MERCHANTABILITY, FITNESS FOR A PARTICULAR
+             PURPOSE, NON-INFRINGEMENT, ABSENCE OF LATENT OR OTHER DEFECTS,
+             ACCURACY, OR THE PRESENCE OR ABSENCE OF ERRORS, WHETHER OR NOT
+             KNOWN OR DISCOVERABLE. WHERE DISCLAIMERS OF WARRANTIES ARE NOT
+             ALLOWED IN FULL OR IN PART, THIS DISCLAIMER MAY NOT APPLY TO YOU.
+        
+          b. TO THE EXTENT POSSIBLE, IN NO EVENT WILL THE LICENSOR BE LIABLE
+             TO YOU ON ANY LEGAL THEORY (INCLUDING, WITHOUT LIMITATION,
+             NEGLIGENCE) OR OTHERWISE FOR ANY DIRECT, SPECIAL, INDIRECT,
+             INCIDENTAL, CONSEQUENTIAL, PUNITIVE, EXEMPLARY, OR OTHER LOSSES,
+             COSTS, EXPENSES, OR DAMAGES ARISING OUT OF THIS PUBLIC LICENSE OR
+             USE OF THE LICENSED MATERIAL, EVEN IF THE LICENSOR HAS BEEN
+             ADVISED OF THE POSSIBILITY OF SUCH LOSSES, COSTS, EXPENSES, OR
+             DAMAGES. WHERE A LIMITATION OF LIABILITY IS NOT ALLOWED IN FULL OR
+             IN PART, THIS LIMITATION MAY NOT APPLY TO YOU.
+        
+          c. The disclaimer of warranties and limitation of liability provided
+             above shall be interpreted in a manner that, to the extent
+             possible, most closely approximates an absolute disclaimer and
+             waiver of all liability.
+        
+        
+        Section 6 -- Term and Termination.
+        
+          a. This Public License applies for the term of the Copyright and
+             Similar Rights licensed here. However, if You fail to comply with
+             this Public License, then Your rights under this Public License
+             terminate automatically.
+        
+          b. Where Your right to use the Licensed Material has terminated under
+             Section 6(a), it reinstates:
+        
+               1. automatically as of the date the violation is cured, provided
+                  it is cured within 30 days of Your discovery of the
+                  violation; or
+        
+               2. upon express reinstatement by the Licensor.
+        
+             For the avoidance of doubt, this Section 6(b) does not affect any
+             right the Licensor may have to seek remedies for Your violations
+             of this Public License.
+        
+          c. For the avoidance of doubt, the Licensor may also offer the
+             Licensed Material under separate terms or conditions or stop
+             distributing the Licensed Material at any time; however, doing so
+             will not terminate this Public License.
+        
+          d. Sections 1, 5, 6, 7, and 8 survive termination of this Public
+             License.
+        
+        
+        Section 7 -- Other Terms and Conditions.
+        
+          a. The Licensor shall not be bound by any additional or different
+             terms or conditions communicated by You unless expressly agreed.
+        
+          b. Any arrangements, understandings, or agreements regarding the
+             Licensed Material not stated herein are separate from and
+             independent of the terms and conditions of this Public License.
+        
+        
+        Section 8 -- Interpretation.
+        
+          a. For the avoidance of doubt, this Public License does not, and
+             shall not be interpreted to, reduce, limit, restrict, or impose
+             conditions on any use of the Licensed Material that could lawfully
+             be made without permission under this Public License.
+        
+          b. To the extent possible, if any provision of this Public License is
+             deemed unenforceable, it shall be automatically reformed to the
+             minimum extent necessary to make it enforceable. If the provision
+             cannot be reformed, it shall be severed from this Public License
+             without affecting the enforceability of the remaining terms and
+             conditions.
+        
+          c. No term or condition of this Public License will be waived and no
+             failure to comply consented to unless expressly agreed to by the
+             Licensor.
+        
+          d. Nothing in this Public License constitutes or may be interpreted
+             as a limitation upon, or waiver of, any privileges and immunities
+             that apply to the Licensor or You, including from the legal
+             processes of any jurisdiction or authority.
+        
+        
+        =======================================================================
+        
+        Creative Commons is not a party to its public
+        licenses. Notwithstanding, Creative Commons may elect to apply one of
+        its public licenses to material it publishes and in those instances
+        will be considered the “Licensor.” The text of the Creative Commons
+        public licenses is dedicated to the public domain under the CC0 Public
+        Domain Dedication. Except for the limited purpose of indicating that
+        material is shared under a Creative Commons public license or as
+        otherwise permitted by the Creative Commons policies published at
+        creativecommons.org/policies, Creative Commons does not authorize the
+        use of the trademark "Creative Commons" or any other trademark or logo
+        of Creative Commons without its prior written consent including,
+        without limitation, in connection with any unauthorized modifications
+        to any of its public licenses or any other arrangements,
+        understandings, or agreements concerning use of licensed material. For
+        the avoidance of doubt, this paragraph does not form part of the
+        public licenses.
+        
+        Creative Commons may be contacted at creativecommons.org.
+Keywords: quantum computing,neural networks,CNN,machine learning
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Physics
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Requires-Dist: annotated-types==0.7.0
+Requires-Dist: antlr4-python3-runtime==4.9.3
+Requires-Dist: appdirs==1.4.4
+Requires-Dist: asttokens==3.0.0
+Requires-Dist: astunparse==1.6.3
+Requires-Dist: autograd==1.8.0
+Requires-Dist: autoray==0.7.1
+Requires-Dist: cachetools==5.5.2
+Requires-Dist: certifi==2025.4.26
+Requires-Dist: cffi==1.17.1
+Requires-Dist: charset-normalizer==3.4.2
+Requires-Dist: comm==0.2.2
+Requires-Dist: contourpy==1.3.2
+Requires-Dist: cryptography==45.0.2
+Requires-Dist: cycler==0.12.1
+Requires-Dist: debugpy==1.8.14
+Requires-Dist: decorator==5.2.1
+Requires-Dist: diastatic-malt==2.15.2
+Requires-Dist: dill==0.4.0
+Requires-Dist: executing==2.2.0
+Requires-Dist: filelock==3.18.0
+Requires-Dist: fonttools==4.58.0
+Requires-Dist: fsspec==2025.3.2
+Requires-Dist: gast==0.6.0
+Requires-Dist: hydra-core==1.3.2
+Requires-Dist: ibm-cloud-sdk-core==3.23.0
+Requires-Dist: ibm-platform-services==0.65.0
+Requires-Dist: idna==3.10
+Requires-Dist: ipykernel==6.29.5
+Requires-Dist: ipython==9.2.0
+Requires-Dist: ipython_pygments_lexers==1.1.1
+Requires-Dist: jedi==0.19.2
+Requires-Dist: Jinja2==3.1.6
+Requires-Dist: joblib==1.5.0
+Requires-Dist: jupyter_client==8.6.3
+Requires-Dist: jupyter_core==5.7.2
+Requires-Dist: kiwisolver==1.4.8
+Requires-Dist: MarkupSafe==3.0.2
+Requires-Dist: matplotlib==3.10.3
+Requires-Dist: matplotlib-inline==0.1.7
+Requires-Dist: mpmath==1.3.0
+Requires-Dist: nest-asyncio==1.6.0
+Requires-Dist: networkx==3.4.2
+Requires-Dist: numpy==2.2.5
+Requires-Dist: nvidia-cublas-cu12==12.6.4.1
+Requires-Dist: nvidia-cuda-cupti-cu12==12.6.80
+Requires-Dist: nvidia-cuda-nvrtc-cu12==12.6.77
+Requires-Dist: nvidia-cuda-runtime-cu12==12.6.77
+Requires-Dist: nvidia-cudnn-cu12==9.5.1.17
+Requires-Dist: nvidia-cufft-cu12==11.3.0.4
+Requires-Dist: nvidia-cufile-cu12==1.11.1.6
+Requires-Dist: nvidia-curand-cu12==10.3.7.77
+Requires-Dist: nvidia-cusolver-cu12==11.7.1.2
+Requires-Dist: nvidia-cusparse-cu12==12.5.4.2
+Requires-Dist: nvidia-cusparselt-cu12==0.6.3
+Requires-Dist: nvidia-nccl-cu12==2.26.2
+Requires-Dist: nvidia-nvjitlink-cu12==12.6.85
+Requires-Dist: nvidia-nvtx-cu12==12.6.77
+Requires-Dist: omegaconf==2.3.0
+Requires-Dist: packaging==25.0
+Requires-Dist: parso==0.8.4
+Requires-Dist: pbr==6.1.1
+Requires-Dist: PennyLane==0.41.1
+Requires-Dist: PennyLane-qiskit
+Requires-Dist: PennyLane_Lightning==0.41.1
+Requires-Dist: pexpect==4.9.0
+Requires-Dist: pillow==11.2.1
+Requires-Dist: platformdirs==4.3.8
+Requires-Dist: prompt_toolkit==3.0.51
+Requires-Dist: psutil==7.0.0
+Requires-Dist: ptyprocess==0.7.0
+Requires-Dist: pure_eval==0.2.3
+Requires-Dist: pycparser==2.22
+Requires-Dist: pydantic==2.11.4
+Requires-Dist: pydantic_core==2.33.2
+Requires-Dist: Pygments==2.19.1
+Requires-Dist: PyJWT==2.10.1
+Requires-Dist: pyparsing==3.2.3
+Requires-Dist: pyspnego==0.11.2
+Requires-Dist: python-dateutil==2.9.0.post0
+Requires-Dist: PyYAML==6.0.2
+Requires-Dist: pyzmq==26.4.0
+Requires-Dist: qiskit
+Requires-Dist: qiskit-aer==0.16.0
+Requires-Dist: qiskit-ibm-provider==0.11.0
+Requires-Dist: qiskit-ibm-runtime==0.29.0
+Requires-Dist: requests==2.32.3
+Requires-Dist: requests_ntlm==1.3.0
+Requires-Dist: rustworkx==0.16.0
+Requires-Dist: scikit-learn==1.6.1
+Requires-Dist: scipy==1.15.3
+Requires-Dist: scipy-openblas32==0.3.29.0.0
+Requires-Dist: setuptools==80.7.1
+Requires-Dist: six==1.17.0
+Requires-Dist: stack-data==0.6.3
+Requires-Dist: stevedore==5.4.1
+Requires-Dist: symengine==0.13.0
+Requires-Dist: sympy
+Requires-Dist: termcolor==3.1.0
+Requires-Dist: threadpoolctl==3.6.0
+Requires-Dist: tomlkit==0.13.2
+Requires-Dist: torch
+Requires-Dist: torchvision==0.22.0
+Requires-Dist: tornado==6.4.2
+Requires-Dist: traitlets==5.14.3
+Requires-Dist: triton==3.3.0
+Requires-Dist: typing-inspection==0.4.0
+Requires-Dist: typing_extensions==4.13.2
+Requires-Dist: urllib3==2.4.0
+Requires-Dist: wcwidth==0.2.13
+Requires-Dist: websocket-client==1.8.0
+Requires-Dist: websockets==15.0.1
+Requires-Dist: wheel==0.45.1
+Dynamic: license-file
+
+# Noisy hybrid quantum-classical convolutional neural networks for multi-class image classification
+
+## Key features
+This library allows to investigate the performance of a noisy hybrid quantum-classical convolutional neural networks and compare it to its classical counterpart.
+
+The library allows to create, train and validate CNNs composed of:
+- a single quantum convolutional layer;
+- a flattening operation;
+- a single fully-connected layer;
+- a softmax layer.
+
+As in the classical case, the quantum convolutional layer acts on the input image by extracting sliding blocks from it and performing an operation - called filtering - on each of these blocks. However, unlike the ordinary case, the filtering operation relies upon the execution of a (variational) quantum circuit. More specifically, the $N$ pixel values of each sliding block are mapped into a $N$-qubit variational quantum circuit (VQC) by means of a particular arrangement of non-trainable parametric quantum gates, which compose the so-called "feature map". The remaining part of the VQC, usually referred to as "ansatz", features trainable parametric quantum gates. Finally, the VQC is executed a number of times and measurements in the computational basis on the output quantum state are performed, so to give an estimate for its $2^N$ probability coefficients. The obtained $2^N$ real values are fed into the $2^N$ output images, which are then created by means of a single filter. The number of trainable parameters in the ansatz can be chosen arbitrarily, so that one could in principle explore the chance to obtain better performance with fewer parameters.
+
+The parameters update of the whole net is performed by means of the mini-batch gradient descent algorithm. In order to differentiate the quantum filter's output, the parameter-shift rule is applied.
+
+The whole model is inspired to that proposed by Junhua Liu [1].
+
+Users have to possibility to decide whether to execution the VQC contained within the filter with or without quantum noise. Moreover, they can choose to introduce one or more noise models.
+
+## Usage
+To use the library, follow the steps below.
+1. Set the quantum filter architecture (feature map, ansatz, noise etc.), the model hyperparameters (epochs, learning rate etc.), the path of the dataset (dataset_folder_path) and the path of the csv file for saving the evolution of the metrics along the training (csv_path) in the configuration file. The configuration file location is `conf\config.yaml`.
+2. Execute `python main.py` in the terminal to start training and validation. The evolution of the metrics along the training procedure are saved in `csv_path`, indicated in the configuration file.
+
+A default 4-class synthetic dataset of 3x3 images, called 'Tetris', is placed in the root directory of the library. This dataset is composed of 640 training images, 160 validation images and 200 test images. Each image represent a tetris brick. The grey value of the brick pixels is randomly chosen between 0.7 and 1, whereas that of the background pixels between 0 and 0.3.
+
+## Author
+Giuseppe D'Ambruoso (Lutech S.p.A., University of Bari Aldo Moro).
+
+## Acknowledgements
+This library was realized with the indinspensable help of dr. Dario del Sorbo (Lutech S.p.A.), dr. Claudio Basilio Caporusso (Lutech S.p.A.), dr. Ivan Palmisano (Lutech S.p.A.), dr. Giuseppe Lamanna (Lutech S.p.A.) and prof. dr. Giovanni Gramegna (University of Bari Aldo Moro). We acknowledge also the support from the whole Lutech R&D 'MILE' pole, directed by dr. Giuseppe Ieva (Lutech S.p.A.).
+
+## References
+[1] Liu et al. (2021). _Hybrid quantum-classical convolutional neural networks_. Science China Physics, Mechanics &amp; Astronomy. DOI: 10.1007/s11433-021-1734-3. url: http://dx.doi.org/10.1007/s11433-021-1734-3.

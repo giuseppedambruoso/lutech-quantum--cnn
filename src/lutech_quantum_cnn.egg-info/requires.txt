@@ -61,7 +61,7 @@ packaging==25.0
 parso==0.8.4
 pbr==6.1.1
 PennyLane==0.41.1
-PennyLane-qiskit==0.41.0.post0
+PennyLane-qiskit
 PennyLane_Lightning==0.41.1
 pexpect==4.9.0
 pillow==11.2.1
@@ -80,7 +80,7 @@ pyspnego==0.11.2
 python-dateutil==2.9.0.post0
 PyYAML==6.0.2
 pyzmq==26.4.0
-qiskit==1.2.4
+qiskit
 qiskit-aer==0.16.0
 qiskit-ibm-provider==0.11.0
 qiskit-ibm-runtime==0.29.0
@@ -95,11 +95,11 @@ six==1.17.0
 stack-data==0.6.3
 stevedore==5.4.1
 symengine==0.13.0
-sympy==1.12.1
+sympy
 termcolor==3.1.0
 threadpoolctl==3.6.0
 tomlkit==0.13.2
-torch==2.7.0
+torch
 torchvision==0.22.0
 tornado==6.4.2
 traitlets==5.14.3

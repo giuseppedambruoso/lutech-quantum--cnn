@@ -16,25 +16,32 @@ Users have to possibility to decide wether to make the execution of the VQC cont
 """
 
 # Import necessary libraries
-from src_pennylane.dataset import load_dataset, num_classes
-from src_pennylane.net import create_cnn
-from src_pennylane.plot import plot_results
-from src_pennylane.training import Trainer
+from lutech_quantum_cnn.dataset import load_dataset, num_classes
+from lutech_quantum_cnn.net import create_cnn
+from lutech_quantum_cnn.plot import plot_results
+from lutech_quantum_cnn.training import Trainer
 
 from torch.nn import MSELoss, CrossEntropyLoss
 
+import os
 import hydra
 from omegaconf import DictConfig
 from typing import Union, List
 from torch import manual_seed
 import pennylane as qml
+from pennylane.devices.device_api import Device
 
 manual_seed(42)
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(config: DictConfig) -> None:
     # Define configuration
-    dataset_folder_path = config["dataset_folder_path"]
+    dataset_folder_path : str
+    if config["dataset_folder_path"] == 'Tetris':
+        dataset_folder_path = os.getcwd() + \
+            "/src/lutech_quantum_cnn/" + config["dataset_folder_path"]
+    else:
+        dataset_folder_path = config["dataset_folder_path"]
     BATCH_SIZE = config["batch_size"]
     noise = config["noise"]
     NOISE_PROB = config["noise_probability"]
@@ -64,7 +71,7 @@ def main(config: DictConfig) -> None:
     num_qubits : int = int(KERNEL_SIZE * KERNEL_SIZE)
     wires : List = list(range(num_qubits))
     # device = qml.device("default.mixed", wires=wires)
-    device : qml.devices
+    device : Device | None
     if isinstance(NOISE_PROB, float):
         if NOISE_PROB > 1 or NOISE_PROB < 0:
             raise ValueError("NOISE_PROB must be in the range [0, 1]")
@@ -72,6 +79,8 @@ def main(config: DictConfig) -> None:
             device = qml.device("default.mixed", wires=wires)
         elif NOISE_PROB == 0:
             device = qml.device("default.qubit", wires=wires)
+    else:
+        device = None
 
     # Create the cnn
     model = create_cnn(
