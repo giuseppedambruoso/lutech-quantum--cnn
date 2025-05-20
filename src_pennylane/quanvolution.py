@@ -1,9 +1,12 @@
 import numpy as np
+from src_pennylane.operations import RealAmplitudes, AngleEmbedding
 
 import pennylane as qml
 from pennylane.measurements import ProbabilityMP
 from pennylane.qnn import TorchLayer
-from pennylane.templates.layers.strongly_entangling import StronglyEntanglingLayersRY
+from pennylane.typing import TensorLike
+from pennylane.ops.channel import DepolarizingChannel
+from pennylane.ops.qubit.parametric_ops_multi_qubit import IsingZZ
 
 from torch import Tensor, manual_seed
 import torch.nn as nn
@@ -12,9 +15,13 @@ import torch
 
 manual_seed(42)
 
-def z_feature_map(input_features: Tensor, reps: int) -> None:
+def z_feature_map(
+        input_features: Tensor,
+        reps: int,
+        noise: str | None = None,
+        noise_prob: float | None = None,
+    ) -> None:
     """Z feature map for the VQC."""
-
     if len(input_features) < 1:
         raise ValueError("Number of features must be at least 1.")
     if reps < 1:
@@ -23,13 +30,20 @@ def z_feature_map(input_features: Tensor, reps: int) -> None:
     for r in range(reps):
         for i in range(len(input_features)):
             qml.Hadamard(wires=i)
-        qml.AngleEmbedding(
+        AngleEmbedding(
             features=[2*feature for feature in input_features],
             wires=range(len(input_features)),
-            rotation='Y'
+            rotation='Y',
+            noise=noise,
+            noise_prob=noise_prob
         )
-        
-def zz_feature_map(input_features: Tensor, reps: int) -> None:
+
+def zz_feature_map(
+        input_features: Tensor,
+        reps: int,
+        noise: str | None = None,
+        noise_prob : float | None = None
+    ) -> None:
     """ZZ feature map for the VQC."""
 
     if len(input_features) < 1:
@@ -40,33 +54,47 @@ def zz_feature_map(input_features: Tensor, reps: int) -> None:
     for r in range(reps):
         for i in range(len(input_features)):
             qml.Hadamard(wires=i)
-        qml.AngleEmbedding(
+        AngleEmbedding(
             features=[2 * feature for feature in input_features],
             wires=range(len(input_features)),
-            rotation='Y'
+            rotation='Y',
+            noise=noise,
+            noise_prob=noise_prob
         )
         for i in range(len(input_features) - 1):
-            phi_val : Tensor = 2 * (np.pi - input_features[i]) * (np.pi - input_features[i+1])
-            qml.IsingZZ(wires=[i + 1,i], phi=phi_val) # type: ignore
+            phi_val : TensorLike = 2 * (np.pi - input_features[i]) * (np.pi - input_features[i+1]) # type: ignore
+            IsingZZ(wires=[i + 1,i], phi=phi_val)
+        if noise == 'depolarizing':    
+            for i in range(len(input_features)):
+                DepolarizingChannel(p=noise_prob, wires=i)
 
 def real_amplitudes_ansatz(
         num_qubits: int,
         reps: int,
-        params: Tensor
+        params: Tensor,
+        noise: str | None,
+        noise_prob: float | None
     ) -> None:
     """Ansatz for the VQC."""
 
     if reps < 1:
         raise ValueError("Feature map repetitions must be at least 1.")
+    for r in range(reps):
+        RealAmplitudes(
+            weights=params,
+            wires=range(num_qubits),
+            noise=noise,
+            noise_prob=noise_prob
+        )
 
-    StronglyEntanglingLayersRY(weights=params, wires=range(num_qubits))
-        
 class Quanvolution(nn.Module):
     """Quanvolutional layer for quantum convolutional neural networks."""
 
     def __init__(
         self,
         device: qml.devices,
+        noise: str | None,
+        noise_prob: float | None,
         feature_map: str,
         ansatz: str,
         feature_map_reps: int,
@@ -98,8 +126,8 @@ class Quanvolution(nn.Module):
         ) -> ProbabilityMP:
             """Quantum circuit for the VQC."""
             if feature_map not in ['z', 'zz']:
-                raise ValueError("Feature map must be either 'z' or 'zz'.")
-            if ansatz != 'real_amplitudes':
+                raise ValueError("Feature map must be 'z' or 'zz'.")
+            if ansatz not in ['real_amplitudes']:
                 raise ValueError("Ansatz must be 'real_amplitudes'.")
 
             num_qubits: int = int(qfilter_size * qfilter_size)
@@ -113,8 +141,13 @@ class Quanvolution(nn.Module):
                 real_amplitudes_ansatz(
                     num_qubits=num_qubits,
                     reps=ansatz_reps,
-                    params=params
+                    params=params,
+                    noise=noise,
+                    noise_prob=noise_prob
                 )
+            # if self.show_circuit:
+            #     print(qml.draw(qnode)(inputs, params))
+            
             return qml.probs(wires=range(num_qubits))
 
         # Calculate the shape of the parameters

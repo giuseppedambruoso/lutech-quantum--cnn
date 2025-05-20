@@ -25,7 +25,7 @@ from torch.nn import MSELoss, CrossEntropyLoss
 
 import hydra
 from omegaconf import DictConfig
-from typing import Union
+from typing import Union, List
 from torch import manual_seed
 import pennylane as qml
 
@@ -34,11 +34,11 @@ manual_seed(42)
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(config: DictConfig) -> None:
     # Define configuration
-    hybrid = config["hybrid"]
     dataset_folder_path = config["dataset_folder_path"]
     BATCH_SIZE = config["batch_size"]
+    noise = config["noise"]
+    NOISE_PROB = config["noise_probability"]
     KERNEL_SIZE = config["kernel_size"]
-    device = qml.device("default.qubit")
     feature_map = config["feature_map"]
     ansatz = config["ansatz"]
     FEATURE_MAP_REPS = config["feature_map_reps"]
@@ -50,24 +50,37 @@ def main(config: DictConfig) -> None:
         else CrossEntropyLoss()
     EPOCHS = config["epochs"]
     LEARNING_RATE = config["learning_rate"]
-    csv_path = config["csv_path"]
-
+    
     # Set random seed for reproducibility
     manual_seed(42)
-
+    
     # Load data
     train_loader, test_loader, _ = load_dataset(
         dataset_folder_path=dataset_folder_path,
         batch_size=BATCH_SIZE
     )
 
+    # Create device
+    num_qubits : int = int(KERNEL_SIZE * KERNEL_SIZE)
+    wires : List = list(range(num_qubits))
+    # device = qml.device("default.mixed", wires=wires)
+    device : qml.devices
+    if isinstance(NOISE_PROB, float):
+        if NOISE_PROB > 1 or NOISE_PROB < 0:
+            raise ValueError("NOISE_PROB must be in the range [0, 1]")
+        elif NOISE_PROB > 0:
+            device = qml.device("default.mixed", wires=wires)
+        elif NOISE_PROB == 0:
+            device = qml.device("default.qubit", wires=wires)
+
     # Create the cnn
     model = create_cnn(
-        hybrid = hybrid,
         train_loader = test_loader,
         dataset_folder_path = dataset_folder_path,
         kernel_size = KERNEL_SIZE,
         device = device,
+        noise = noise,
+        noise_prob = NOISE_PROB,
         feature_map = feature_map,
         ansatz = ansatz,
         feature_map_reps = FEATURE_MAP_REPS,
@@ -83,8 +96,7 @@ def main(config: DictConfig) -> None:
         test_loader=test_loader,
         loss_fn=loss_fn,
         epochs=EPOCHS,
-        learning_rate=LEARNING_RATE,
-        csv_path=csv_path
+        learning_rate=LEARNING_RATE
     )
 
     # Get results

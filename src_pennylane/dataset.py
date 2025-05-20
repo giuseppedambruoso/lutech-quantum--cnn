@@ -2,7 +2,7 @@ import os
 
 import torch
 from torch import manual_seed
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import Compose, Resize, Grayscale, ToTensor
 
@@ -211,6 +211,11 @@ def load_dataset(
         root=test_dir, transform=transform, target_transform=target_transform
     )
 
+#    # Limit the datasets to the first 10 images
+#    train_dataset = Subset(train_dataset, range(min(10, len(train_dataset))))
+#    validation_dataset = Subset(validation_dataset, range(min(10, len(validation_dataset))))
+#    test_dataset = Subset(test_dataset, range(min(10, len(test_dataset))))
+
     # Create data loaders for train, validation, and test datasets
     train_loader = DataLoader(
         dataset=train_dataset,
@@ -221,13 +226,11 @@ def load_dataset(
     validation_loader = DataLoader(
         dataset=validation_dataset,
         batch_size=len(validation_dataset),
-        shuffle=False,
-        pin_memory=True
+        shuffle=False
     )
     test_loader = DataLoader(
         dataset=test_dataset,
         batch_size=len(test_dataset),
-        shuffle=False,
-        pin_memory=True
+        shuffle=False
     )
     return train_loader, validation_loader, test_loader
