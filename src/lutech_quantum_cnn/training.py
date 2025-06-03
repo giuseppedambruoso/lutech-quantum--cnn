@@ -10,7 +10,7 @@ from torch import Tensor, no_grad, argmax, manual_seed
 from torch import max as torch_max
 from torch.optim.adam import Adam
 from torch.utils.data import DataLoader
-from torch.nn import DataParallel
+# from torch.nn import DataParallel
 from torch.nn.modules.loss import MSELoss, CrossEntropyLoss
 
 manual_seed(42)
@@ -58,7 +58,8 @@ class Trainer:
         epochs: int,
         learning_rate: float,
     ):
-        self.model = DataParallel(model)
+#        self.model = DataParallel(model) #qui
+        self.model = model
         self.epochs = epochs
         self.train_loader = train_loader
         self.test_loader = test_loader

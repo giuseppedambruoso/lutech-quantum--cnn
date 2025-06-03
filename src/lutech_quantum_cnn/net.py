@@ -11,7 +11,6 @@ from torch.nn import (
     ReLU,
     Linear,
     Flatten,
-    Softmax,
     Sequential,
     Module
 )
