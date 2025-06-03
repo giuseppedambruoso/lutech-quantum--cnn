@@ -2,6 +2,7 @@ import os
 import numpy as np
 from PIL import Image
 import random
+import matplotlib.pyplot as plt
 
 # Set the random seed for reproducibility
 random.seed(42)
@@ -11,28 +12,48 @@ def generate_tetris_brick(brick_type):
     """Generates a 3x3 grayscale image of a Tetris brick with random orientation and pixel values."""
     orientations = {
         'S': [
-            np.array([[0, 1, 1], [1, 1, 0], [0, 0, 0]]),
-            np.array([[1, 0, 0], [1, 1, 0], [0, 1, 1]]),
             np.array([[0, 0, 0], [0, 1, 1], [1, 1, 0]]),
+            np.array([[0, 0, 0], [1, 1, 0], [0, 1, 1]]),
             np.array([[1, 1, 0], [0, 1, 1], [0, 0, 0]]),
+            np.array([[0, 1, 1], [1, 1, 0], [0, 0, 0]]),
+            np.array([[0, 1, 1], [0, 1, 1], [0, 1, 0]]),
+            np.array([[1, 0, 0], [1, 1, 0], [0, 1, 0]]),
+            np.array([[0, 1, 0], [0, 1, 1], [0, 0, 1]]),
+            np.array([[0, 1, 0], [1, 1, 0], [1, 0, 0]]),
         ],
         'L': [
-            np.array([[0, 0, 1], [1, 1, 1], [0, 0, 0]]),
+            np.array([[1, 1, 1], [1, 0, 0], [0, 0, 0]]),
+            np.array([[1, 1, 1], [0, 0, 1], [0, 0, 0]]),
+            np.array([[1, 1, 0], [1, 0, 0], [1, 0, 0]]),
+            np.array([[0, 1, 1], [0, 0, 1], [0, 0, 1]]),
+            np.array([[0, 0, 0], [1, 0, 0], [1, 1, 1]]),
+            np.array([[0, 0, 0], [0, 0, 1], [1, 1, 1]]),
             np.array([[1, 0, 0], [1, 0, 0], [1, 1, 0]]),
+            np.array([[0, 0, 1], [0, 0, 1], [0, 1, 1]]),
             np.array([[0, 0, 0], [1, 1, 1], [1, 0, 0]]),
+            np.array([[0, 0, 0], [1, 1, 1], [0, 0, 1]]),
             np.array([[0, 1, 1], [0, 1, 0], [0, 1, 0]]),
+            np.array([[1, 1, 0], [0, 1, 0], [0, 1, 0]]),
+            np.array([[0, 1, 0], [0, 1, 0], [0, 1, 1]]),
+            np.array([[0, 1, 0], [0, 1, 0], [1, 1, 0]]),
+            np.array([[1, 0, 0], [1, 1, 1], [0, 0, 0]]),
+            np.array([[0, 0, 1], [1, 1, 1], [0, 0, 0]])
         ],
         'O': [
             np.array([[1, 1, 0], [1, 1, 0], [0, 0, 0]]),
+            np.array([[0, 0, 0], [1, 1, 0], [1, 1, 0]]),
             np.array([[0, 1, 1], [0, 1, 1], [0, 0, 0]]),
-            np.array([[1, 1, 0], [1, 1, 0], [0, 0, 0]]), # Included again for balance
-            np.array([[0, 1, 1], [0, 1, 1], [0, 0, 0]]), # Included again for balance
+            np.array([[0, 0, 0], [0, 1, 1], [0, 1, 1]]),
         ],
         'T': [
             np.array([[0, 1, 0], [1, 1, 1], [0, 0, 0]]),
             np.array([[0, 1, 0], [0, 1, 1], [0, 1, 0]]),
             np.array([[0, 0, 0], [1, 1, 1], [0, 1, 0]]),
             np.array([[1, 0, 0], [1, 1, 0], [1, 0, 0]]),
+            np.array([[0, 0, 0], [0, 1, 0], [1, 1, 1]]),
+            np.array([[1, 1, 1], [0, 1, 0], [0, 0, 0]]),
+            np.array([[0, 0, 1], [0, 1, 1], [0, 0, 1]]),
+            np.array([[0, 1, 0], [1, 1, 0], [0, 1, 0]]),
         ],
     }
 
@@ -55,13 +76,16 @@ def create_dataset(num_samples, output_dir):
     samples_per_class = num_samples // 4
     classes = ['S', 'L', 'O', 'T']
 
+    print(f"\n--- Generating dataset for: {os.path.basename(output_dir)} ---")
     for brick_type in classes:
         class_dir = os.path.join(output_dir, brick_type)
         os.makedirs(class_dir, exist_ok=True)  # Create class-specific directory
         for i in range(samples_per_class):
             image, label = generate_tetris_brick(brick_type)
             image.save(os.path.join(class_dir, f"{label}_{i}.png"))
-    print(f"Generated {num_samples} images in '{output_dir}'")
+        print(f"  {brick_type}: {samples_per_class} images")
+    print(f"Generated a total of {num_samples} images in '{output_dir}'")
+
 
 # Define dataset sizes and output directory
 total_samples = 1000
@@ -77,4 +101,4 @@ create_dataset(train_size, os.path.join(output_base_dir, "Training"))
 create_dataset(validation_size, os.path.join(output_base_dir, "Validation"))
 create_dataset(test_size, os.path.join(output_base_dir, "Test"))
 
-print("Dataset creation complete.")
+print("\nDataset creation complete.")

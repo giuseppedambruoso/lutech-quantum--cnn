@@ -45,6 +45,8 @@ def main(config: DictConfig) -> None:
     BATCH_SIZE = config["batch_size"]
     noise = config["noise"]
     NOISE_PROB = config["noise_probability"]
+    if NOISE_PROB != None :
+        NOISE_PROB = float(NOISE_PROB)
     KERNEL_SIZE = config["kernel_size"]
     feature_map = config["feature_map"]
     ansatz = config["ansatz"]
@@ -70,9 +72,8 @@ def main(config: DictConfig) -> None:
     # Create device
     num_qubits : int = int(KERNEL_SIZE * KERNEL_SIZE)
     wires : List = list(range(num_qubits))
-    # device = qml.device("default.mixed", wires=wires)
     device : Device | None
-    if isinstance(NOISE_PROB, float):
+    if isinstance(NOISE_PROB, (float, int)):
         if NOISE_PROB > 1 or NOISE_PROB < 0:
             raise ValueError("NOISE_PROB must be in the range [0, 1]")
         elif NOISE_PROB > 0:
@@ -98,7 +99,7 @@ def main(config: DictConfig) -> None:
         show_circuit = show_circuit,
     )
 
-    # Perform training and validation of the model
+    # Train and test the model
     trainer = Trainer(
         model=model,
         train_loader=train_loader,

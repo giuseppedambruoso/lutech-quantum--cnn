@@ -69,7 +69,7 @@ class Trainer:
         if model.prob is None:
             path = 'classical'
         else :
-            path = str(model.prob) + '%'
+            path = model.feature_map_reps + model.feature_map + model.ansatz_reps + model.ansatz + str(model.prob) + '%'
 
         # Create the output folder if it doesn't exist
         if not os.path.exists('results'):
@@ -77,8 +77,8 @@ class Trainer:
         if not os.path.exists('plots'):
             os.makedirs('plots')
 
-        self.csv_path = os.path.join('results', path + '.csv')
-        self.plot_path = os.path.join('plots', path + '.pdf')
+        self.csv_path = os.path.join('results', path)
+        self.plot_path = os.path.join('plots', path)
 
     def train_and_validate(self) -> Union[TrainingResult, None]:
         model = self.model

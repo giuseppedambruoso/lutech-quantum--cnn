@@ -52,7 +52,7 @@ class ClassicNet(Module):
                 in_features=classifier_input_features,
                 out_features=classifier_output_features
             ),
-            Softmax(dim=1)
+#            Softmax(dim=1)
         )
 
         self.prob = None
@@ -83,6 +83,10 @@ class HybridNet(Module):
         super(HybridNet, self).__init__()
 
         self.prob = noise_prob
+        self.feature_map = feature_map
+        self.feature_map_reps = str(feature_map_reps)
+        self.ansatz : str = 'ra' if ansatz == 'real_amplitudes' else ansatz
+        self.ansatz_reps = str(ansatz_reps)
         
         self.quanvolution = Quanvolution(
             device=device,
@@ -103,7 +107,7 @@ class HybridNet(Module):
                 in_features=classifier_input_features,
                 out_features=classifier_output_features,
             ),
-            Softmax(dim=1)
+#            Softmax(dim=1)
         )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -176,7 +180,7 @@ def create_cnn(
 
     # Create either the classical or the hybrid cnn
     model: Module
-    if noise is None or noise_prob is None or device is None:
+    if device == None:
         model = ClassicNet(
             kernel_size=kernel_size,
             convolution_output_channels=convolution_output_channels,

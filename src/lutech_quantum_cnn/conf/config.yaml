@@ -1,6 +1,6 @@
 dataset_folder_path: 'Tetris'
 batch_size : 40
-noise : 'depolarizing' # Set to Null for classical
+noise : 'depolarizing'
 noise_probability : 0 # Set to Null for classical
 kernel_size: 2
 feature_map : 'zz'
@@ -9,5 +9,5 @@ feature_map_reps : 1
 ansatz_reps : 1
 show_circuit : False
 loss_function : 'MSE'
-epochs : 100
+epochs : 400
 learning_rate: 0.01
