@@ -21,6 +21,7 @@ from lutech_quantum_cnn.net import create_cnn
 from lutech_quantum_cnn.plot import plot_results
 from lutech_quantum_cnn.training import Trainer
 
+import torch
 from torch.nn import MSELoss, CrossEntropyLoss
 
 import os
@@ -32,6 +33,16 @@ import pennylane as qml
 from pennylane.devices.device_api import Device
 
 manual_seed(42)
+
+# Verifica se la GPU è disponibile
+print(torch.cuda.is_available())  # True se la GPU è utilizzabile
+
+# Mostra quale GPU è attiva (se disponibile)
+if torch.cuda.is_available():
+    print(torch.cuda.get_device_name(0))
+
+# pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+# pip install -e .
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(config: DictConfig) -> None:
@@ -69,7 +80,11 @@ def main(config: DictConfig) -> None:
         batch_size=BATCH_SIZE
     )
 
-    # Create device
+    # Determine PyTorch device (CPU or GPU)
+    torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch_device = torch.device("cpu")
+    
+    # Create PennyLane device
     num_qubits : int = int(KERNEL_SIZE * KERNEL_SIZE)
     wires : List = list(range(num_qubits))
     device : Device | None
@@ -83,25 +98,30 @@ def main(config: DictConfig) -> None:
     else:
         device = None
 
-    # Create the cnn
+    # Create the CNN, now passing torch_device
     model = create_cnn(
-        train_loader = test_loader,
-        dataset_folder_path = dataset_folder_path,
-        kernel_size = KERNEL_SIZE,
-        device = device,
-        noise = noise,
-        noise_prob = NOISE_PROB,
-        feature_map = feature_map,
-        ansatz = ansatz,
-        feature_map_reps = FEATURE_MAP_REPS,
-        ansatz_reps = ANSATZ_REPS,
-        classes = CLASSES,
-        show_circuit = show_circuit,
+        train_loader=test_loader,
+        dataset_folder_path=dataset_folder_path,
+        kernel_size=KERNEL_SIZE,
+        device=device,
+        torch_device=torch_device,  # <-- new argument here
+        noise=noise,
+        noise_prob=NOISE_PROB,
+        feature_map=feature_map,
+        ansatz=ansatz,
+        feature_map_reps=FEATURE_MAP_REPS,
+        ansatz_reps=ANSATZ_REPS,
+        classes=CLASSES,
+        show_circuit=show_circuit,
     )
+
+    # Move model to torch_device (just in case)
+    model.to(torch_device)
 
     # Train and test the model
     trainer = Trainer(
         model=model,
+        torch_device=torch_device,
         train_loader=train_loader,
         test_loader=test_loader,
         loss_fn=loss_fn,

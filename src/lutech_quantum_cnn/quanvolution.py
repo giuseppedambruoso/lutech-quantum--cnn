@@ -157,44 +157,43 @@ class Quanvolution(nn.Module):
         self.qfilter = TorchLayer(qnode=qnode, weight_shapes=weight_shape) # type: ignore
 
     def forward(self, data_loader: Tensor) -> Tensor:
-        # Unfold the input tensor to prepare it for quantum processing
-        # print('input data shape: ', data_loader.shape)
+        device = next(self.parameters()).device  # Get model device dynamically
+        
+        # Unfold and transpose as before
         input_unfolded: Tensor = F.unfold(
             input=data_loader,
             kernel_size=int(self.qfilter_size),
         ).transpose(1, 2)
-        # print('input unfolded shape: ', input_unfolded.shape)
 
-        # Reshape the unfolded input to extract sliding blocks
+        # Reshape unfolded input to sliding blocks
         input_unfolded_reshaped: Tensor = input_unfolded.reshape(
             input_unfolded.size(0) * input_unfolded.size(1), -1
+        ).to(device)  # Ensure it's on correct device
+
+        # Create output tensor on the same device
+        output_unfolded : Tensor = torch.zeros(
+            size=(input_unfolded_reshaped.size(0), self.output_channels),
+            device=device
         )
-        # print('input unfolded reshaped shape: ', input_unfolded_reshaped.shape)
 
-        # Apply the quantum filter every sliding block
-        output_unfolded : Tensor = torch.zeros(size=(input_unfolded_reshaped.size(0), self.output_channels))
+        # Apply quantum filter to each sliding block
         for i in range(input_unfolded_reshaped.size(0)):
-            sliding_block : Tensor = input_unfolded_reshaped[i].squeeze()
+            sliding_block : Tensor = input_unfolded_reshaped[i].squeeze().to(device)
             output_unfolded[i] = self.qfilter(sliding_block)
-        # print('output unfolded shape: ', output_unfolded.shape)
 
-        # Reshape the output to match the original unfolded input shape
+        # Reshape output to match unfolded input shape
         output_unfolded_reshaped: Tensor = output_unfolded.view(
             input_unfolded.size(0), input_unfolded.size(1), -1
         )
-        # print('output unfolded reshaped shape: ', output_unfolded_reshaped.shape)
 
-        # Transpose the reshaped output to prepare for refolding
-        output_unfolded_reshaped: Tensor = output_unfolded_reshaped.transpose(1, 2)
-        # print('output unfolded reshaped transposed shape: ', output_unfolded_reshaped.shape)
+        # Transpose output
+        output_unfolded_reshaped = output_unfolded_reshaped.transpose(1, 2)
 
-        # Refold the output tensor to its original spatial dimensions
+        # Refold the output to original spatial dimensions
         output_refolded: Tensor = output_unfolded_reshaped.view(
             input_unfolded.size(0),
             output_unfolded.size(1),
             int(output_unfolded_reshaped.size(2) ** 0.5),
             int(output_unfolded_reshaped.size(2) ** 0.5),
         )
-        # print('output refolded shape: ', output_refolded.shape)
-
         return output_refolded

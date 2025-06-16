@@ -6,12 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "lutech-quantum-cnn"
 version = "0.1.1"
 description = "A quantum convolutional neural network library."
-readme = "README.md"        # Path to your project's README file
-requires-python = ">=3.8"   # Minimum Python version required
+readme = "README.md"
+requires-python = ">=3.8"
 license = { file = "LICENSE.txt" }
 keywords = ["quantum computing", "neural networks", "CNN", "machine learning"]
 authors = [
-    { name = "Giuseppe", email = "github.crayfish163@passinbox.com" }, # Replace with your actual name/email
+    { name = "Giuseppe", email = "github.crayfish163@passinbox.com" },
 ]
 maintainers = [
     { name = "Giuseppe", email = "github.crayfish163@passinbox.com" },
@@ -29,7 +29,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Physics",
 ]
-# Define your project's dependencies
+
 dependencies = [
     "annotated-types==0.7.0",
     "antlr4-python3-runtime==4.9.3",
@@ -48,7 +48,6 @@ dependencies = [
     "cycler==0.12.1",
     "debugpy==1.8.14",
     "decorator==5.2.1",
-    "diastatic-malt==2.15.2",
     "dill==0.4.0",
     "executing==2.2.0",
     "filelock==3.18.0",
@@ -75,20 +74,6 @@ dependencies = [
     "nest-asyncio==1.6.0",
     "networkx==3.4.2",
     "numpy==2.2.5",
-    "nvidia-cublas-cu12==12.6.4.1",
-    "nvidia-cuda-cupti-cu12==12.6.80",
-    "nvidia-cuda-nvrtc-cu12==12.6.77",
-    "nvidia-cuda-runtime-cu12==12.6.77",
-    "nvidia-cudnn-cu12==9.5.1.17",
-    "nvidia-cufft-cu12==11.3.0.4",
-    "nvidia-cufile-cu12==1.11.1.6",
-    "nvidia-curand-cu12==10.3.7.77",
-    "nvidia-cusolver-cu12==11.7.1.2",
-    "nvidia-cusparse-cu12==12.5.4.2",
-    "nvidia-cusparselt-cu12==0.6.3",
-    "nvidia-nccl-cu12==2.26.2",
-    "nvidia-nvjitlink-cu12==12.6.85",
-    "nvidia-nvtx-cu12==12.6.77",
     "omegaconf==2.3.0",
     "packaging==25.0",
     "parso==0.8.4",
@@ -113,7 +98,7 @@ dependencies = [
     "python-dateutil==2.9.0.post0",
     "PyYAML==6.0.2",
     "pyzmq==26.4.0",
-    "qiskit",
+    "qiskit>=1.0.0,<2.0.0",
     "qiskit-aer==0.16.0",
     "qiskit-ibm-provider==0.11.0",
     "qiskit-ibm-runtime==0.29.0",
@@ -127,16 +112,12 @@ dependencies = [
     "six==1.17.0",
     "stack-data==0.6.3",
     "stevedore==5.4.1",
-    "symengine==0.13.0",
-    "sympy",
+    "sympy>=1.12,<2.0",
     "termcolor==3.1.0",
     "threadpoolctl==3.6.0",
     "tomlkit==0.13.2",
-    "torch",
-    "torchvision==0.22.0",
     "tornado==6.4.2",
     "traitlets==5.14.3",
-    "triton==3.3.0",
     "typing-inspection==0.4.0",
     "typing_extensions==4.13.2",
     "urllib3==2.4.0",
@@ -146,14 +127,11 @@ dependencies = [
     "wheel==0.45.1"
 ]
 
-# This is the key part for creating command-line scripts
 [project.scripts]
-# Format: <command_name> = "<package_name>.<module_name>:<function_name>"
 qccnn = "lutech_quantum_cnn.cli:main"
 
-# Add this section to include non-Python files
 [tool.setuptools.package-data]
 "lutech_quantum_cnn" = [
-    "Tetris/*",      # Includes all files and subdirectories in Tetris
-    "conf/config.yaml" # Includes the config.yaml file
+    "Tetris/*",
+    "conf/config.yaml"
 ]
