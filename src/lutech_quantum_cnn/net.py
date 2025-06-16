@@ -5,6 +5,7 @@ from typing import Union
 from lutech_quantum_cnn.dataset import num_classes
 from lutech_quantum_cnn.quanvolution import Quanvolution
 
+import torch
 from torch import Tensor, manual_seed
 from torch.nn import (
     Conv2d,
@@ -19,16 +20,13 @@ from torch.utils.data import DataLoader
 manual_seed(42)
 
 class ClassicNet(Module):
-    """Convolutional Neural Network composed of a single convolutional layer,
-    followed by a single fully connected layer and a softmax.
-    """
-
     def __init__(
         self,
         kernel_size: int,
         convolution_output_channels: int,
         classifier_input_features: int,
-        classifier_output_features: int
+        classifier_output_features: int,
+        torch_device: torch.device,  # NEW: PyTorch device param
     ):
         super(ClassicNet, self).__init__()
 
@@ -36,6 +34,7 @@ class ClassicNet(Module):
         self.convolution_output_channels = convolution_output_channels
         self.classifier_input_features = classifier_input_features
         self.classifier_output_features = classifier_output_features
+        self.torch_device = torch_device  # store device
 
         self.convolution = Conv2d(
             in_channels=1,
@@ -51,23 +50,19 @@ class ClassicNet(Module):
                 in_features=classifier_input_features,
                 out_features=classifier_output_features
             ),
-#            Softmax(dim=1)
         )
 
         self.prob = None
+
     def forward(self, x: Tensor) -> Tensor:
-        # print('Model parameters:', self.convolution.state_dict())
         return self.net(x)
 
 
 class HybridNet(Module):
-    """Convolutional Neural Network composed of a single convolutional layer,
-    followed by a single fully connected layer and a softmax.
-    """
-
     def __init__(
         self,
-        device: Device,
+        device: Device,              # PennyLane device (unchanged param name)
+        torch_device: torch.device,  # PyTorch device param
         noise: str | None,
         noise_prob: float | None,
         feature_map: str,
@@ -81,12 +76,15 @@ class HybridNet(Module):
     ):
         super(HybridNet, self).__init__()
 
+        self.device = device                  # PennyLane device (same name)
+        self.torch_device = torch_device      # PyTorch device
+
         self.prob = noise_prob
         self.feature_map = feature_map
         self.feature_map_reps = str(feature_map_reps)
-        self.ansatz : str = 'ra' if ansatz == 'real_amplitudes' else ansatz
+        self.ansatz = 'ra' if ansatz == 'real_amplitudes' else ansatz
         self.ansatz_reps = str(ansatz_reps)
-        
+
         self.quanvolution = Quanvolution(
             device=device,
             noise=noise,
@@ -97,7 +95,7 @@ class HybridNet(Module):
             ansatz_reps=ansatz_reps,
             qfilter_size=qfilter_size,
             show_circuit=show_circuit
-     )
+        )
 
         self.net = Sequential(
             self.quanvolution,
@@ -106,12 +104,11 @@ class HybridNet(Module):
                 in_features=classifier_input_features,
                 out_features=classifier_output_features,
             ),
-#            Softmax(dim=1)
         )
 
     def forward(self, x: Tensor) -> Tensor:
-        # print('Model parameters:', self.quanvolution.state_dict())
-        return self.net(x)
+        output = self.net(x)
+        return output
 
 
 def flatten_dimension(
@@ -119,29 +116,13 @@ def flatten_dimension(
     kernel_size: int,
     convolution_output_channels: int,
 ) -> int:
-    """Determine the number of neurons obtained by flattening the output
-    images of the convolutional layer.
-    """
-
-    # Determine the width of the images
     images, _ = next(iter(train_loader))
     in_width: int = images.shape[3]
 
-    # Determine the width of the kernel
     k_width: int = int(kernel_size)
-#    print('Kernel size:', k_width)
-
-    # Determine the width of the output images
     out_width: int = int(in_width - k_width + 1)
-
-    # Determine the number of pixels in each output image
     out_pixels: int = int(out_width * out_width)
-#    print('Output image size:', out_pixels)
-
-    # Determine the total number of pixel
     flatten_size: int = out_pixels * convolution_output_channels
-#    print('Flatten size:', flatten_size)
-
     return flatten_size
 
 
@@ -149,7 +130,8 @@ def create_cnn(
     train_loader: DataLoader,
     dataset_folder_path: str,
     kernel_size: int,
-    device: Device | None,
+    device: Device | None,                # PennyLane device (same name)
+    torch_device: torch.device | None,   # PyTorch device (new param)
     noise: str | None,
     noise_prob: float | None,
     feature_map: str,
@@ -159,46 +141,42 @@ def create_cnn(
     classes: int,
     show_circuit: bool = False,
 ) -> Union[HybridNet, ClassicNet]:
-    """Create either a classical or a hybrid convolutional neural network
-    composed of a single convolutional layer, a single dense layer.
-    """
 
     convolution_output_channels: int = int(2 ** (kernel_size * kernel_size))
 
-    # Determine the number of input features of the classifier
     classifier_input_features: int = flatten_dimension(
         train_loader=train_loader,
         kernel_size=kernel_size,
         convolution_output_channels=convolution_output_channels,
     )
 
-    # Determine the number of classes
     classifier_output_features: int = num_classes(
         dataset_folder_path=dataset_folder_path
     )
 
-    # Create either the classical or the hybrid cnn
-    model: Module
-    if device == None:
+    if device is None or torch_device is None:
+        # pass torch_device also here to ClassicNet
         model = ClassicNet(
             kernel_size=kernel_size,
             convolution_output_channels=convolution_output_channels,
             classifier_input_features=classifier_input_features,
             classifier_output_features=classifier_output_features,
+            torch_device=torch.device('cpu')  # fallback default device
         )
     else:
         model = HybridNet(
-            device = device,
-            noise = noise,
-            noise_prob = noise_prob,
-            feature_map = feature_map,
-            ansatz = ansatz,
-            feature_map_reps = feature_map_reps,
+            device=device,
+            torch_device=torch_device,
+            noise=noise,
+            noise_prob=noise_prob,
+            feature_map=feature_map,
+            ansatz=ansatz,
+            feature_map_reps=feature_map_reps,
             ansatz_reps=ansatz_reps,
             qfilter_size=kernel_size,
-            classifier_input_features = classifier_input_features,
-            classifier_output_features = classes,
-            show_circuit = show_circuit
+            classifier_input_features=classifier_input_features,
+            classifier_output_features=classes,
+            show_circuit=show_circuit
         )
 
     return model

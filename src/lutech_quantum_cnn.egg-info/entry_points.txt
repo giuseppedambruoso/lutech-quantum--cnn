@@ -1,0 +1,2 @@
+[console_scripts]
+qccnn = lutech_quantum_cnn.cli:main

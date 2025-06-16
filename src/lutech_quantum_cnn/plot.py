@@ -10,9 +10,6 @@ def plot_results(results: TrainingResult):
     ----------
     results : TrainingResult
         The results to be plotted.
-    output_folder : str, optional
-        The name of the folder where the plots will be saved.
-        Defaults to "training_plots".
     """
     output_folder = results.plot_path
 
@@ -27,48 +24,48 @@ def plot_results(results: TrainingResult):
 
     # Plot and save Train Cost as PDF
     plt.figure(figsize=(6, 4))
-    plt.plot(avg_epoch_train_costs, label="Train cost function")
+    plt.plot([x.cpu().item() for x in avg_epoch_train_costs], label="Train cost function")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Cost on the training set")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_folder, "train_cost.pdf")) # Save in the specified folder
+    plt.savefig(os.path.join(output_folder, "train_cost.pdf"))
     plt.close()
 
     # Plot and save Test Cost as PDF
     plt.figure(figsize=(6, 4))
-    plt.plot(avg_epoch_test_costs, label="Test cost function")
+    plt.plot([x.cpu().item() for x in avg_epoch_test_costs], label="Test cost function")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Cost on the test set")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_folder, "test_cost.pdf")) # Save in the specified folder
+    plt.savefig(os.path.join(output_folder, "test_cost.pdf"))
     plt.close()
 
     # Plot and save Train Accuracy as PDF
     plt.figure(figsize=(6, 4))
-    plt.plot(avg_epoch_train_accuracies, label="Train accuracy")
+    plt.plot([x.cpu().item() for x in avg_epoch_train_accuracies], label="Train accuracy")
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
     plt.title("Accuracy on the training set")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_folder, "train_accuracy.pdf")) # Save in the specified folder
+    plt.savefig(os.path.join(output_folder, "train_accuracy.pdf"))
     plt.close()
 
     # Plot and save Test Accuracy as PDF
     plt.figure(figsize=(6, 4))
-    plt.plot(avg_epoch_test_accuracies, label="Test accuracy")
+    plt.plot([x.cpu().item() for x in avg_epoch_test_accuracies], label="Test accuracy")
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
     plt.title("Accuracy on the test set")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_folder, "test_accuracy.pdf")) # Save in the specified folder
+    plt.savefig(os.path.join(output_folder, "test_accuracy.pdf"))
     plt.close()
