@@ -34,13 +34,6 @@ from pennylane.devices.device_api import Device
 
 manual_seed(42)
 
-# Verifica se la GPU è disponibile
-print(torch.cuda.is_available())  # True se la GPU è utilizzabile
-
-# Mostra quale GPU è attiva (se disponibile)
-if torch.cuda.is_available():
-    print(torch.cuda.get_device_name(0))
-
 # pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121
 # pip install -e .
 
@@ -82,7 +75,7 @@ def main(config: DictConfig) -> None:
 
     # Determine PyTorch device (CPU or GPU)
     torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch_device = torch.device("cpu")
+    # torch_device = torch.device("cpu")
     
     # Create PennyLane device
     num_qubits : int = int(KERNEL_SIZE * KERNEL_SIZE)

@@ -91,8 +91,7 @@ class Trainer:
                 model.train()
 
                 for batch_index, (inputs, labels) in enumerate(self.train_loader):
-                    inputs, labels = inputs.to(self.device), labels.to(self.device)
-
+                    inputs, labels = inputs.to(self.device, non_blocking=True), labels.to(self.device, non_blocking=True)
                     optimizer.zero_grad()
 
                     output = model(inputs).to(self.device)
