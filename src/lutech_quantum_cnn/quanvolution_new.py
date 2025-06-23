@@ -9,10 +9,11 @@ from pennylane.ops.channel import DepolarizingChannel
 from pennylane.ops.qubit.parametric_ops_multi_qubit import IsingZZ
 from pennylane.devices.device_api import Device
 
-from torch import Tensor, manual_seed
-import torch.nn as nn
-from torch.nn import functional as F
+import torch.nn.functional as F
 import torch
+from torch import Tensor, manual_seed, vmap
+import torch.nn as nn
+
 
 manual_seed(42)
 
@@ -88,20 +89,21 @@ def real_amplitudes_ansatz(
             noise_prob=noise_prob
         )
 
+
 class Quanvolution(nn.Module):
     """Quanvolutional layer for quantum convolutional neural networks."""
 
     def __init__(
         self,
-        device: Device,
-        noise: str | None,
-        noise_prob: float | None,
-        feature_map: str,
-        ansatz: str,
-        feature_map_reps: int,
-        ansatz_reps: int,
-        qfilter_size: int,
-        show_circuit: bool=False
+        device,
+        noise,
+        noise_prob,
+        feature_map,
+        ansatz,
+        feature_map_reps,
+        ansatz_reps,
+        qfilter_size,
+        show_circuit=False
     ) -> None:
         
         super(Quanvolution, self).__init__()
@@ -111,21 +113,16 @@ class Quanvolution(nn.Module):
         self.feature_map_reps = feature_map_reps
         self.ansatz_reps = ansatz_reps
         self.show_circuit = show_circuit
-        self.num_qubits : int = int(qfilter_size * qfilter_size)
+        self.num_qubits: int = int(qfilter_size * qfilter_size)
         self.output_channels = int(2 ** self.num_qubits)
         self.qfilter_size = qfilter_size
 
-        # Define the quantum filter
         @qml.qnode(
             device=device,
             interface='torch',
             diff_method='parameter-shift',
         )
-        def qnode(
-            inputs: Tensor,
-            params: Tensor
-        ) -> ProbabilityMP:
-            """Quantum circuit for the VQC."""
+        def qnode(inputs: torch.Tensor, params: torch.Tensor):
             if feature_map not in ['z', 'zz']:
                 raise ValueError("Feature map must be 'z' or 'zz'.")
             if ansatz not in ['real_amplitudes']:
@@ -149,49 +146,54 @@ class Quanvolution(nn.Module):
             
             return qml.probs(wires=range(num_qubits))
 
-        # Calculate the shape of the parameters
-        weight_shape = {"params": ((ansatz_reps + 1),(qfilter_size ** 2))}
-
+        weight_shape = {"params": ((ansatz_reps + 1), (qfilter_size ** 2))}
         self.qfilter = TorchLayer(qnode=qnode, weight_shapes=weight_shape) # type: ignore
 
-    def forward(self, data_loader: Tensor) -> Tensor:
-        device = next(self.parameters()).device  # Get model device dynamically
+    def forward(self, data_loader: torch.Tensor) -> torch.Tensor:
+        device = next(self.parameters()).device
         
-        # Unfold and transpose as before
-        input_unfolded: Tensor = F.unfold(
+        print('input shape:', data_loader.shape)
+
+        # Unfold input into sliding blocks
+        input_unfolded: torch.Tensor = F.unfold(
             input=data_loader,
             kernel_size=int(self.qfilter_size),
-        ).transpose(1, 2)
+        ).transpose(1, 2)  # shape: (batch_size, num_blocks, block_size)
+        print('unfolded input shape:', input_unfolded.shape)
 
-        # Reshape unfolded input to sliding blocks
-        input_unfolded_reshaped: Tensor = input_unfolded.reshape(
-            input_unfolded.size(0) * input_unfolded.size(1), -1
-        ).to(device)  # Ensure it's on correct device
+        # Reshape to (total_blocks, block_size)
+        input_unfolded_reshaped: torch.Tensor = input_unfolded.reshape(
+            -1, self.num_qubits
+        ).to(device)
+        print('reshaped unfolded input shape:', input_unfolded_reshaped.shape)
 
-        # Create output tensor on the same device
-        output_unfolded : Tensor = torch.zeros(
-            size=(input_unfolded_reshaped.size(0), self.output_channels),
-            device=device
+        # Vectorize qfilter with vmap
+        batched_qfilter = vmap(self.qfilter)
+
+        # Apply qfilter to all sliding blocks in parallel
+        output_unfolded: torch.Tensor = batched_qfilter(input_unfolded_reshaped)
+        print('output unfolded after qfilter shape:', output_unfolded.shape)
+
+        # Reshape output to (batch_size, num_blocks, output_channels)
+        batch_size = data_loader.size(0)
+        num_blocks = input_unfolded.size(1)
+        output_unfolded_reshaped: torch.Tensor = output_unfolded.view(
+            batch_size, num_blocks, -1
         )
+        print('reshaped output unfolded shape:', output_unfolded_reshaped.shape)
 
-        # Apply quantum filter to each sliding block
-        for i in range(input_unfolded_reshaped.size(0)):
-            sliding_block : Tensor = input_unfolded_reshaped[i].squeeze().to(device)
-            output_unfolded[i] = self.qfilter(sliding_block)
-
-        # Reshape output to match unfolded input shape
-        output_unfolded_reshaped: Tensor = output_unfolded.view(
-            input_unfolded.size(0), input_unfolded.size(1), -1
-        )
-
-        # Transpose output
+        # Transpose to (batch_size, output_channels, num_blocks)
         output_unfolded_reshaped = output_unfolded_reshaped.transpose(1, 2)
+        print('transposed output unfolded shape:', output_unfolded_reshaped.shape)
 
-        # Refold the output to original spatial dimensions
-        output_refolded: Tensor = output_unfolded_reshaped.view(
-            input_unfolded.size(0),
-            output_unfolded.size(1),
-            int(output_unfolded_reshaped.size(2) ** 0.5),
-            int(output_unfolded_reshaped.size(2) ** 0.5),
+        # Refold to (batch_size, output_channels, H, W)
+        side_len = int(output_unfolded_reshaped.size(2) ** 0.5)
+        output_refolded: torch.Tensor = output_unfolded_reshaped.view(
+            batch_size,
+            output_unfolded_reshaped.size(1),
+            side_len,
+            side_len,
         )
+        print('refolded output shape:', output_refolded.shape)
+
         return output_refolded

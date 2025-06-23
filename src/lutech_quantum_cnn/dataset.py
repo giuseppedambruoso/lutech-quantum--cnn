@@ -221,16 +221,19 @@ def load_dataset(
         dataset=train_dataset,
         batch_size=batch_size,
         shuffle=True,
-        drop_last=drop_last
+        drop_last=drop_last,
+        pin_memory=True
     )
     validation_loader = DataLoader(
         dataset=validation_dataset,
         batch_size=len(validation_dataset),
-        shuffle=False
+        shuffle=False,
+        pin_memory=True
     )
     test_loader = DataLoader(
         dataset=test_dataset,
         batch_size=len(test_dataset),
-        shuffle=False
+        shuffle=False,
+        pin_memory=True
     )
     return train_loader, validation_loader, test_loader
