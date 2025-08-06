@@ -6,8 +6,7 @@ This library allows to investigate the performance of a noisy hybrid quantum-cla
 The library allows to create, train and validate CNNs composed of:
 - a single quantum convolutional layer;
 - a flattening operation;
-- a single fully-connected layer;
-- a softmax layer.
+- a single fully-connected layer.
 
 As in the classical case, the quantum convolutional layer acts on the input image by extracting sliding blocks from it and performing an operation - called filtering - on each of these blocks. However, unlike the ordinary case, the filtering operation relies upon the execution of a (variational) quantum circuit. More specifically, the $N$ pixel values of each sliding block are mapped into a $N$-qubit variational quantum circuit (VQC) by means of a particular arrangement of non-trainable parametric quantum gates, which compose the so-called "feature map". The remaining part of the VQC, usually referred to as "ansatz", features trainable parametric quantum gates. Finally, the VQC is executed a number of times and measurements in the computational basis on the output quantum state are performed, so to give an estimate for its $2^N$ probability coefficients. The obtained $2^N$ real values are fed into the $2^N$ output images, which are then created by means of a single filter. The number of trainable parameters in the ansatz can be chosen arbitrarily, so that one could in principle explore the chance to obtain better performance with fewer parameters.
 
@@ -24,8 +23,8 @@ Users have to possibility to decide whether to execution the VQC contained withi
 
 ## Usage
 To use the library, follow the steps below.
-1. Set the quantum filter architecture (feature map, ansatz, noise etc.), the model hyperparameters (epochs, learning rate etc.), the path of the dataset (dataset_folder_path) and the path of the csv file for saving the evolution of the metrics along the training (csv_path) in the configuration file. The configuration file location is `conf\config.yaml`.
-2. Execute `python main.py` in the terminal to start training and validation. The evolution of the metrics along the training procedure are saved in `csv_path`, indicated in the configuration file.
+1. Set the quantum filter architecture (feature map, ansatz, noise etc.), the model hyperparameters (epochs, learning rate etc.), the path of the dataset (dataset_folder_path) and the path of the csv file for saving the evolution of the metrics along the training (csv_path) in the configuration file. The configuration file location is `src/lutec_quantum_cnn/conf/config.yaml`.
+2. Execute "qccnn" in the terminal to start training and testing. The evolution of the metrics along the training procedure are saved in `results`.
 
 A default 4-class synthetic dataset of 3x3 images, called 'Tetris', is placed in the root directory of the library. This dataset is composed of 640 training images, 160 validation images and 200 test images. Each image represent a tetris brick. The grey value of the brick pixels is randomly chosen between 0.7 and 1, whereas that of the background pixels between 0 and 0.3.
 
