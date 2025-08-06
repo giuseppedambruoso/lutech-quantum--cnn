@@ -498,8 +498,6 @@ Requires-Dist: stevedore==5.4.1
 Requires-Dist: sympy<2.0,==1.13.1
 Requires-Dist: termcolor==3.1.0
 Requires-Dist: threadpoolctl==3.6.0
-Requires-Dist: torch==2.5.1+cu121
-Requires-Dist: torchvision==0.20.1+cu121
 Requires-Dist: tomlkit==0.13.2
 Requires-Dist: tornado==6.4.2
 Requires-Dist: traitlets==5.14.3

@@ -26,7 +26,7 @@ class ClassicNet(Module):
         convolution_output_channels: int,
         classifier_input_features: int,
         classifier_output_features: int,
-        torch_device: torch.device,  # NEW: PyTorch device param
+        torch_device: torch.device,
     ):
         super(ClassicNet, self).__init__()
 
@@ -34,7 +34,7 @@ class ClassicNet(Module):
         self.convolution_output_channels = convolution_output_channels
         self.classifier_input_features = classifier_input_features
         self.classifier_output_features = classifier_output_features
-        self.torch_device = torch_device  # store device
+        self.torch_device = torch_device
 
         self.convolution = Conv2d(
             in_channels=1,
@@ -61,8 +61,8 @@ class ClassicNet(Module):
 class HybridNet(Module):
     def __init__(
         self,
-        device: Device,              # PennyLane device (unchanged param name)
-        torch_device: torch.device,  # PyTorch device param
+        device: Device,          
+        torch_device: torch.device,
         noise: str | None,
         noise_prob: float | None,
         feature_map: str,
@@ -76,8 +76,8 @@ class HybridNet(Module):
     ):
         super(HybridNet, self).__init__()
 
-        self.device = device                  # PennyLane device (same name)
-        self.torch_device = torch_device      # PyTorch device
+        self.device = device                  
+        self.torch_device = torch_device  
 
         self.prob = noise_prob
         self.feature_map = feature_map
@@ -130,8 +130,8 @@ def create_cnn(
     train_loader: DataLoader,
     dataset_folder_path: str,
     kernel_size: int,
-    device: Device | None,                # PennyLane device (same name)
-    torch_device: torch.device | None,   # PyTorch device (new param)
+    device: Device | None,                
+    torch_device: torch.device | None,   
     noise: str | None,
     noise_prob: float | None,
     feature_map: str,
@@ -155,13 +155,12 @@ def create_cnn(
     )
 
     if device is None or torch_device is None:
-        # pass torch_device also here to ClassicNet
         model = ClassicNet(
             kernel_size=kernel_size,
             convolution_output_channels=convolution_output_channels,
             classifier_input_features=classifier_input_features,
             classifier_output_features=classifier_output_features,
-            torch_device=torch.device('cpu')  # fallback default device
+            torch_device=torch.device('cpu')
         )
     else:
         model = HybridNet(
