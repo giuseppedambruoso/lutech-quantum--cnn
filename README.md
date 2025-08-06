@@ -19,7 +19,8 @@ Users have to possibility to decide whether to execution the VQC contained withi
 ## Installation
 1. Clone the repository
 2. Create a virtual environment
-3. In the terminal, run the command "pip install -e ." to install the package and all its dependencies.
+3. In the terminal, run the command "# pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121"
+4. In the terminal, run the command "pip install -e ." to install the package and all its dependencies.
 
 ## Usage
 To use the library, follow the steps below.
