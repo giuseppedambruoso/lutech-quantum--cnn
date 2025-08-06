@@ -34,9 +34,6 @@ from pennylane.devices.device_api import Device
 
 manual_seed(42)
 
-# pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121
-# pip install -e .
-
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(config: DictConfig) -> None:
     # Define configuration
@@ -74,8 +71,14 @@ def main(config: DictConfig) -> None:
     )
 
     # Determine PyTorch device (CPU or GPU)
-    torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # torch_device = torch.device("cpu")
+    if config["device"] == 'cuda':
+        if not torch.cuda.is_available():
+            torch_device = torch.device("cpu")
+            print("CUDA is not available. CPU will be used.")
+        else:
+            torch_device = torch.device("cuda")
+    elif config["device"] == 'cpu':
+        torch_device = torch.device("cpu")
     
     # Create PennyLane device
     num_qubits : int = int(KERNEL_SIZE * KERNEL_SIZE)

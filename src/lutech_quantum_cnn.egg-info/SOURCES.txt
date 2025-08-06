@@ -8,6 +8,7 @@ src/lutech_quantum_cnn/net.py
 src/lutech_quantum_cnn/operations.py
 src/lutech_quantum_cnn/plot.py
 src/lutech_quantum_cnn/quanvolution.py
+src/lutech_quantum_cnn/quanvolution_new.py
 src/lutech_quantum_cnn/tetris_generator.py
 src/lutech_quantum_cnn/training.py
 src/lutech_quantum_cnn.egg-info/PKG-INFO

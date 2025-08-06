@@ -11,3 +11,4 @@ show_circuit : False
 loss_function : 'MSE'
 epochs : 400
 learning_rate: 0.01
+device: 'cuda'
