@@ -20,7 +20,7 @@ Users have to possibility to decide whether to execution the VQC contained withi
 ## Installation
 1. Clone the repository
 2. Create a virtual environment
-3. Run the command pip install -e .
+3. In the terminal, run the command "pip install -e ." to install the package and all its dependencies.
 
 ## Usage
 To use the library, follow the steps below.
