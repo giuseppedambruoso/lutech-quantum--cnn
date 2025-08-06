@@ -17,6 +17,11 @@ The whole model is inspired to that proposed by Junhua Liu [1].
 
 Users have to possibility to decide whether to execution the VQC contained within the filter with or without quantum noise. Moreover, they can choose to introduce one or more noise models.
 
+## Installation
+1. Clone the repository
+2. Create a virtual environment
+3. Run the command pip install -e .
+
 ## Usage
 To use the library, follow the steps below.
 1. Set the quantum filter architecture (feature map, ansatz, noise etc.), the model hyperparameters (epochs, learning rate etc.), the path of the dataset (dataset_folder_path) and the path of the csv file for saving the evolution of the metrics along the training (csv_path) in the configuration file. The configuration file location is `conf\config.yaml`.
