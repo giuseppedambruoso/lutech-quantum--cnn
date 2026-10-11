@@ -5,10 +5,10 @@ noise_probability : 0.01 # Null for classical
 kernel_size: 2
 feature_map : 'zz'
 ansatz : 'real_amplitudes'
-feature_map_reps : 1
-ansatz_reps : 1
+feature_map_reps : 2
+ansatz_reps : 2
 show_circuit : False
 loss_function : 'MSE'
 epochs : 400
-learning_rate: 0.01
+learning_rate: 0.1
 device: 'cuda'
